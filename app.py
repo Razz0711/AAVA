@@ -82,7 +82,6 @@ from utils.confidence_score import (
     SampleDataGenerator,
     get_grade_color
 )
-from utils.premium_theme import PREMIUM_CSS, PAGE_GRADIENTS
 
 
 # =============================================================================
@@ -107,14 +106,84 @@ st.set_page_config(
 
 
 # =============================================================================
-# APPLY PREMIUM THEME
+# CUSTOM CSS
 # =============================================================================
 
-st.markdown(PREMIUM_CSS, unsafe_allow_html=True)
-
-# Additional App-specific CSS
 st.markdown("""
 <style>
+    /* Main container styling */
+    .main {
+        padding: 1rem 2rem;
+    }
+    
+    /* Header styling */
+    .main-header {
+        background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+        padding: 1.5rem 2rem;
+        border-radius: 12px;
+        color: white;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .main-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 600;
+    }
+    
+    .main-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 1rem;
+    }
+    
+    /* Metric cards */
+    .metric-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        border-left: 4px solid #2d5a87;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #1e3a5f;
+        line-height: 1;
+    }
+    
+    .metric-label {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 0.5rem;
+    }
+    
+    .metric-delta {
+        font-size: 0.85rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        display: inline-block;
+        margin-top: 0.5rem;
+    }
+    
+    .metric-delta.positive {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+    
+    .metric-delta.negative {
+        background: #ffebee;
+        color: #c62828;
+    }
+    
     /* Grade badges */
     .grade-badge {
         display: inline-block;
@@ -140,7 +209,7 @@ st.markdown("""
         font-size: 2rem;
         font-weight: 700;
         letter-spacing: 2px;
-        background: linear-gradient(135deg, #00d4ff 0%, #667eea 100%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         padding: 1rem;
@@ -156,10 +225,71 @@ st.markdown("""
         font-weight: 500;
     }
     
-    .status-pending { background: rgba(255,171,0,0.2); color: #ffab00; }
-    .status-progress { background: rgba(33,150,243,0.2); color: #2196F3; }
-    .status-completed { background: rgba(0,230,118,0.2); color: #00e676; }
-    .status-failed { background: rgba(255,82,82,0.2); color: #ff5252; }
+    .status-pending { background: #fff3e0; color: #e65100; }
+    .status-progress { background: #e3f2fd; color: #1565c0; }
+    .status-completed { background: #e8f5e9; color: #2e7d32; }
+    .status-failed { background: #ffebee; color: #c62828; }
+    
+    /* Card container */
+    .card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        margin-bottom: 1rem;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1e3a5f;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    /* Sidebar styling */
+    .css-1d391kg {
+        background: linear-gradient(180deg, #1e3a5f 0%, #2d5a87 100%);
+    }
+    
+    /* Tab styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+    }
+    
+    .stTabs [data-baseweb="tab"] {
+        background: white;
+        border-radius: 8px 8px 0 0;
+        padding: 0.75rem 1.5rem;
+        border: 1px solid #e0e0e0;
+        border-bottom: none;
+    }
+    
+    .stTabs [aria-selected="true"] {
+        background: #1e3a5f;
+        color: white;
+    }
+    
+    /* Footer */
+    .footer {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+        font-size: 0.85rem;
+        border-top: 1px solid #e0e0e0;
+        margin-top: 3rem;
+    }
+    
+    /* Animation for loading */
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    .loading {
+        animation: pulse 1.5s ease-in-out infinite;
+    }
 </style>
 """, unsafe_allow_html=True)
 

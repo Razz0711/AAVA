@@ -25,7 +25,6 @@ from utils.confidence_score import (
     get_grade_color,
     get_grade
 )
-from utils.premium_theme import PREMIUM_CSS, PAGE_GRADIENTS
 
 st.set_page_config(
     page_title="Confidence Score - AAVA",
@@ -38,16 +37,57 @@ db = get_database()
 validator = DIGIPINValidator()
 calculator = ConfidenceScoreCalculator()
 
-# Apply Premium Theme
-st.markdown(PREMIUM_CSS, unsafe_allow_html=True)
+# Custom CSS
+st.markdown("""
+<style>
+    .score-display {
+        text-align: center;
+        padding: 2rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .score-value {
+        font-size: 4rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+    .grade-badge {
+        display: inline-block;
+        padding: 0.5rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 2rem;
+        color: white;
+        margin-top: 1rem;
+    }
+    .component-card {
+        background: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        margin-bottom: 0.5rem;
+    }
+    .component-bar {
+        height: 8px;
+        border-radius: 4px;
+        background: #e0e0e0;
+        overflow: hidden;
+    }
+    .component-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.5s ease;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-# Premium Header
-st.markdown(f"""
-<div class="premium-header" style="background: linear-gradient(135deg, {PAGE_GRADIENTS['confidence'][0]} 0%, {PAGE_GRADIENTS['confidence'][1]} 50%, {PAGE_GRADIENTS['confidence'][2]} 100%);">
-    <h1 style="margin: 0; display: flex; align-items: center; gap: 12px;">
-        <span style="font-size: 2rem;">📊</span> Confidence Score Viewer
-    </h1>
-    <p style="margin: 0.5rem 0 0 0; font-size: 1rem; opacity: 0.95;">Analyze address reliability and confidence metrics</p>
+# Header
+st.markdown("""
+<div style="background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%); 
+            padding: 1.5rem 2rem; border-radius: 12px; color: white; margin-bottom: 2rem;">
+    <h1 style="margin: 0;">📊 Confidence Score Viewer</h1>
+    <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Analyze address reliability and confidence metrics</p>
 </div>
 """, unsafe_allow_html=True)
 
