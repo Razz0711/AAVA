@@ -111,6 +111,21 @@ st.set_page_config(
 
 st.markdown("""
 <style>
+    /* Sidebar Navigation - Larger Text */
+    [data-testid="stSidebarNav"] ul {
+        padding-top: 1rem;
+    }
+    [data-testid="stSidebarNav"] li {
+        margin-bottom: 0.5rem;
+    }
+    [data-testid="stSidebarNav"] a {
+        font-size: 1.05rem !important;
+        padding: 0.6rem 1rem !important;
+    }
+    [data-testid="stSidebarNav"] span {
+        font-size: 1.05rem !important;
+    }
+    
     /* Main container styling */
     .main {
         padding: 1rem 2rem;
