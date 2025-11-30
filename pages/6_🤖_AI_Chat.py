@@ -1040,7 +1040,13 @@ with st.sidebar:
     st.markdown('<div class="section-title">Settings</div>', unsafe_allow_html=True)
     
     with st.expander("🔑 API Key", expanded=False):
-        default_key = "AIzaSyAgYKPD2td-TaSmpv7we9bemVh24AK981U"
+        # Get API key from Streamlit secrets or environment
+        default_key = ""
+        try:
+            default_key = st.secrets.get("GEMINI_API_KEY", "")
+        except:
+            default_key = os.environ.get("GEMINI_API_KEY", "")
+        
         api_key = st.text_input(
             "Gemini API Key",
             type="password",
