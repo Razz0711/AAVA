@@ -1186,46 +1186,6 @@ with st.sidebar:
     }
     </style>
     """, unsafe_allow_html=True)
-        cursor: pointer;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-    .chat-item:hover {
-        background: rgba(102, 126, 234, 0.1);
-    }
-    .chat-item.active {
-        background: rgba(102, 126, 234, 0.2);
-        border-left: 3px solid #667eea;
-    }
-    .chat-name {
-        font-size: 0.9rem;
-        color: #333;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 180px;
-    }
-    .chat-time {
-        font-size: 0.7rem;
-        color: #888;
-    }
-    .section-title {
-        font-size: 0.75rem;
-        color: #888;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin: 20px 0 10px 0;
-        padding-left: 5px;
-    }
-    /* Smaller font for chat buttons */
-    [data-testid="stSidebar"] button {
-        font-size: 0.7rem !important;
-        padding: 0.3rem 0.5rem !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
     
     # Header with image and premium blue gradient
     st.markdown("""
