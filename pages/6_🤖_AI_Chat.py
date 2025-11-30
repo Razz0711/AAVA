@@ -769,25 +769,207 @@ A: DARPAN is the address repository (storage). AAVA is the validation agency (qu
 
 You are a versatile, knowledgeable AI assistant. Help users learn and solve any problem!"""
 
-# Custom CSS
+# Custom CSS - Premium Blue Theme
 st.markdown("""
 <style>
+    /* Main container styling */
+    .stApp {
+        background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+    }
+    
+    /* Chat header - Vibrant gradient */
     .chat-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 1.5rem 2rem;
-        border-radius: 12px;
+        background: linear-gradient(135deg, #00d4ff 0%, #0099cc 25%, #667eea 50%, #764ba2 100%);
+        padding: 2rem 2.5rem;
+        border-radius: 20px;
         color: white;
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 10px 40px rgba(0, 212, 255, 0.3);
+        position: relative;
+        overflow: hidden;
     }
+    .chat-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+        animation: pulse 4s ease-in-out infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.5; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+    }
+    .chat-header h1 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        position: relative;
+        z-index: 1;
+    }
+    .chat-header p {
+        font-size: 1rem;
+        opacity: 0.95;
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* AI Badge styling */
     .ai-badge {
-        background: rgba(255,255,255,0.2);
-        padding: 4px 12px;
-        border-radius: 15px;
-        font-size: 0.8rem;
+        background: rgba(255,255,255,0.25);
+        padding: 6px 16px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.3);
     }
+    
+    /* Chat messages container */
     .stChatMessage {
-        background: #f8f9fa;
+        background: linear-gradient(135deg, #1e3a5f 0%, #1a2942 100%) !important;
+        border-radius: 16px !important;
+        border: 1px solid rgba(0, 212, 255, 0.2) !important;
+        margin: 0.8rem 0 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    /* User message styling */
+    [data-testid="stChatMessageContent"] {
+        color: #e8f4fc !important;
+        font-size: 1rem !important;
+        line-height: 1.6 !important;
+    }
+    
+    /* Chat input styling */
+    .stChatInput {
+        border-radius: 25px !important;
+    }
+    .stChatInput > div {
+        background: linear-gradient(135deg, #1e3a5f 0%, #16213e 100%) !important;
+        border: 2px solid #00d4ff !important;
+        border-radius: 25px !important;
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.2) !important;
+    }
+    .stChatInput input {
+        color: white !important;
+        background: transparent !important;
+    }
+    .stChatInput input::placeholder {
+        color: rgba(255,255,255,0.5) !important;
+    }
+    
+    /* Quick action buttons */
+    .quick-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin: 1rem 0;
+    }
+    .quick-btn {
+        background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+    }
+    .quick-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(0, 212, 255, 0.5);
+    }
+    
+    /* Sidebar styling */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0a0a14 0%, #1a1a2e 100%) !important;
+    }
+    [data-testid="stSidebar"] > div {
+        background: transparent !important;
+    }
+    
+    /* Section titles */
+    .section-title {
+        font-size: 0.8rem;
+        color: #00d4ff;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin: 25px 0 15px 0;
+        padding-left: 5px;
+        font-weight: 600;
+    }
+    
+    /* New chat button */
+    .stButton > button[kind="primary"] {
+        background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%) !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 12px 24px !important;
+        font-weight: 600 !important;
+        box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4) !important;
+        transition: all 0.3s ease !important;
+    }
+    .stButton > button[kind="primary"]:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 30px rgba(0, 212, 255, 0.6) !important;
+    }
+    
+    /* Secondary buttons */
+    .stButton > button[kind="secondary"] {
+        background: rgba(0, 212, 255, 0.1) !important;
+        border: 1px solid rgba(0, 212, 255, 0.3) !important;
+        color: #00d4ff !important;
+        border-radius: 10px !important;
+    }
+    .stButton > button[kind="secondary"]:hover {
+        background: rgba(0, 212, 255, 0.2) !important;
+        border-color: #00d4ff !important;
+    }
+    
+    /* Code blocks in chat */
+    code {
+        background: rgba(0, 212, 255, 0.15) !important;
+        color: #00d4ff !important;
+        padding: 3px 8px !important;
+        border-radius: 6px !important;
+    }
+    pre {
+        background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 100%) !important;
+        border: 1px solid rgba(0, 212, 255, 0.2) !important;
+        border-radius: 12px !important;
+        padding: 15px !important;
+    }
+    
+    /* Markdown text in chat */
+    .stMarkdown {
+        color: #e8f4fc !important;
+    }
+    
+    /* Links */
+    a {
+        color: #00d4ff !important;
+    }
+    
+    /* Dividers */
+    hr {
+        border-color: rgba(0, 212, 255, 0.2) !important;
+    }
+    
+    /* Footer styling */
+    .footer-tip {
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(102, 126, 234, 0.1) 100%);
+        border: 1px solid rgba(0, 212, 255, 0.2);
         border-radius: 12px;
+        padding: 15px 20px;
+        margin-top: 20px;
+    }
+    .footer-tip p {
+        color: #88c8e8 !important;
+        margin: 0;
+        font-size: 0.9rem;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -901,53 +1083,109 @@ def process_digipin_commands(user_input):
     
     return None
 
-# Header
+# Header - Premium Design
 st.markdown("""
 <div class="chat-header">
-    <h1 style="margin: 0;">🤖 AAVA AI Assistant</h1>
-    <p style="margin: 0.5rem 0 0 0;">
+    <h1 style="margin: 0; display: flex; align-items: center; gap: 15px;">
+        <span style="font-size: 2.5rem;">🤖</span> AAVA AI Assistant
+    </h1>
+    <p style="margin: 0.8rem 0 0 0; font-size: 1.1rem;">
         Ask me anything about AAVA, DIGIPIN, or address validation
     </p>
+    <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+        <span class="ai-badge">⚡ Powered by Gemini</span>
+        <span class="ai-badge">🧠 Smart Memory</span>
+        <span class="ai-badge">🔒 Secure</span>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Sidebar - Premium Design
+# Sidebar - Premium Blue Design
 with st.sidebar:
     # Custom CSS for premium sidebar
     st.markdown("""
     <style>
     .sidebar-header {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-        padding: 20px;
-        border-radius: 12px;
+        background: linear-gradient(135deg, #00d4ff 0%, #0099cc 50%, #006699 100%);
+        padding: 25px;
+        border-radius: 16px;
         margin-bottom: 20px;
         text-align: center;
+        box-shadow: 0 8px 32px rgba(0, 212, 255, 0.3);
     }
     .sidebar-header h2 {
         color: white;
         margin: 0;
-        font-size: 1.3rem;
+        font-size: 1.4rem;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
     }
     .sidebar-header p {
-        color: #888;
+        color: rgba(255,255,255,0.8);
         margin: 5px 0 0 0;
-        font-size: 0.8rem;
+        font-size: 0.85rem;
     }
     .new-chat-btn {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
         color: white;
         border: none;
-        padding: 12px 20px;
-        border-radius: 10px;
+        padding: 14px 24px;
+        border-radius: 12px;
         width: 100%;
         font-weight: 600;
         cursor: pointer;
         margin-bottom: 15px;
+        box-shadow: 0 4px 20px rgba(0, 212, 255, 0.4);
     }
     .chat-item {
-        padding: 10px 15px;
-        border-radius: 8px;
-        margin: 4px 0;
+        padding: 12px 16px;
+        border-radius: 10px;
+        margin: 6px 0;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(0, 212, 255, 0.05);
+        border: 1px solid transparent;
+    }
+    .chat-item:hover {
+        background: rgba(0, 212, 255, 0.15);
+        border-color: rgba(0, 212, 255, 0.3);
+        transform: translateX(5px);
+    }
+    .chat-item.active {
+        background: rgba(0, 212, 255, 0.2);
+        border-left: 4px solid #00d4ff;
+        box-shadow: 0 4px 15px rgba(0, 212, 255, 0.2);
+    }
+    .chat-name {
+        font-size: 0.9rem;
+        color: #e8f4fc;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 180px;
+    }
+    .chat-time {
+        font-size: 0.7rem;
+        color: #00d4ff;
+    }
+    .section-title {
+        font-size: 0.8rem;
+        color: #00d4ff;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin: 25px 0 15px 0;
+        padding-left: 5px;
+        font-weight: 600;
+    }
+    /* Smaller font for chat buttons */
+    [data-testid="stSidebar"] button {
+        font-size: 0.75rem !important;
+        padding: 0.4rem 0.6rem !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
         cursor: pointer;
         transition: all 0.2s;
         display: flex;
@@ -989,11 +1227,12 @@ with st.sidebar:
     </style>
     """, unsafe_allow_html=True)
     
-    # Header with image and dark blue background - properly centered
+    # Header with image and premium blue gradient
     st.markdown("""
-    <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 20px; border-radius: 12px; margin-bottom: 15px; text-align: center;">
-        <img src="data:image/jpeg;base64,{}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid #4a90d9; margin-bottom: 10px;">
-        <h3 style="margin: 0; color: #ffffff; font-weight: 600; font-size: 1.3rem;">AAVA AI</h3>
+    <div style="background: linear-gradient(135deg, #00d4ff 0%, #0099cc 50%, #006699 100%); padding: 25px; border-radius: 16px; margin-bottom: 20px; text-align: center; box-shadow: 0 8px 32px rgba(0, 212, 255, 0.3);">
+        <img src="data:image/jpeg;base64,{}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 4px solid rgba(255,255,255,0.5); margin-bottom: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+        <h3 style="margin: 0; color: #ffffff; font-weight: 700; font-size: 1.4rem; text-shadow: 0 2px 10px rgba(0,0,0,0.3);">AAVA AI</h3>
+        <p style="margin: 5px 0 0 0; color: rgba(255,255,255,0.85); font-size: 0.85rem;">Intelligent Assistant</p>
     </div>
     """.format(__import__('base64').b64encode(open(ASSISTANT_AVATAR, 'rb').read()).decode()), unsafe_allow_html=True)
     
