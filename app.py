@@ -1158,10 +1158,6 @@ st.markdown(f"""
                 <p class="dev-role">{DEVELOPER['role']}</p>
             </div>
         </div>
-        <div class="stat-box">
-            <div class="stat-number">{visitor_count:,}</div>
-            <div class="stat-label">Total Visitors</div>
-        </div>
     </div>
     <div class="dev-footer">
         <div class="dev-links">
