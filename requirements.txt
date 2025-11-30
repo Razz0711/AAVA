@@ -1,38 +1,10 @@
 # AAVA - Authorised Address Validation Agency
-# Requirements for Streamlit Application
-# Python 3.8+ required
-
-# Core Framework
 streamlit>=1.28.0
-
-# Data Processing
 pandas>=2.0.0
 numpy>=1.24.0
-
-# Visualization
 plotly>=5.18.0
 folium>=0.14.0
 streamlit-folium>=0.15.0
-
-# Database
-# SQLite is built-in with Python
-
-# Image Processing
 Pillow>=10.0.0
-
-# Date/Time
 python-dateutil>=2.8.0
-
-# AI Chat
-google-generativeai>=0.3.0
-
-# Optional: For production deployment
-# gunicorn>=21.0.0
-# python-dotenv>=1.0.0
-
-# AI Chat
-google-generativeai>=0.3.0
-
-# Optional: For enhanced features
-# geopy>=2.4.0
-# shapely>=2.0.0
+google-generativeai
