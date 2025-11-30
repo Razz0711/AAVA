@@ -8,3 +8,4 @@ streamlit-folium>=0.15.0
 Pillow>=10.0.0
 python-dateutil>=2.8.0
 google-generativeai
+python-dotenv
