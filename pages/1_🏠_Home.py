@@ -8,90 +8,84 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from utils.premium_theme import PREMIUM_CSS, PAGE_GRADIENTS
+
 st.set_page_config(
     page_title="Home - AAVA",
     page_icon="🏠",
     layout="wide"
 )
 
-# Header
-st.markdown("""
-<div style="background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); 
-            padding: 3rem 2rem; border-radius: 12px; color: white; 
-            text-align: center; margin-bottom: 2rem;">
-    <h1 style="margin: 0; font-size: 2.5rem;">🏠 AAVA</h1>
-    <h2 style="margin: 0.5rem 0; font-weight: 400; opacity: 0.9;">
+# Apply premium theme
+st.markdown(PREMIUM_CSS, unsafe_allow_html=True)
+
+# Premium Header
+st.markdown(f"""
+<div class="premium-header" style="background: linear-gradient(135deg, {PAGE_GRADIENTS['home'][0]} 0%, {PAGE_GRADIENTS['home'][1]} 50%, {PAGE_GRADIENTS['home'][2]} 100%); text-align: center;">
+    <h1 style="margin: 0; font-size: 2.5rem; display: flex; align-items: center; justify-content: center; gap: 15px;">
+        <span>🏠</span> AAVA
+    </h1>
+    <h2 style="margin: 0.75rem 0; font-weight: 500; font-size: 1.3rem; opacity: 0.95;">
         Authorised Address Validation Agency
     </h2>
-    <p style="margin: 1rem 0 0 0; opacity: 0.8;">
+    <p style="margin: 0.5rem 0 0 0; font-size: 1rem; opacity: 0.9;">
         India's Digital Address Ecosystem • DHRUVA Initiative
     </p>
+    <div style="margin-top: 1rem; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+        <span style="background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 20px; font-size: 0.85rem;">⚡ Real-time</span>
+        <span style="background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 20px; font-size: 0.85rem;">🔒 Secure</span>
+        <span style="background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 20px; font-size: 0.85rem;">🇮🇳 Pan-India</span>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Feature cards
-st.markdown("## 🚀 Quick Access")
+# Feature cards section
+st.markdown('<h2 style="color: #ffffff; font-size: 1.5rem; margin: 2rem 0 1.5rem 0;">🚀 Quick Access</h2>', unsafe_allow_html=True)
 
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     st.markdown("""
-    <div style="background: white; padding: 1.5rem; border-radius: 12px; 
-                box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
-                border-left: 4px solid #4CAF50;">
-        <h3 style="margin: 0;">✅</h3>
-        <h4 style="margin: 0.5rem 0;">Validation Request</h4>
-        <p style="color: #666; font-size: 0.9rem; margin: 0;">
-            Submit new address validation requests
-        </p>
+    <div class="feature-card" style="border-left: 4px solid #00e676;">
+        <div class="icon">✅</div>
+        <h4 style="color: #ffffff; font-size: 1.1rem;">Validation Request</h4>
+        <p style="color: #b8c5d6; font-size: 0.9rem;">Submit validation requests</p>
     </div>
     """, unsafe_allow_html=True)
-    if st.button("Open →", key="btn_val"):
+    if st.button("Open →", key="btn_val", use_container_width=True):
         st.switch_page("pages/2_✅_Validation_Request.py")
 
 with col2:
     st.markdown("""
-    <div style="background: white; padding: 1.5rem; border-radius: 12px; 
-                box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
-                border-left: 4px solid #2196F3;">
-        <h3 style="margin: 0;">📱</h3>
-        <h4 style="margin: 0.5rem 0;">Agent Portal</h4>
-        <p style="color: #666; font-size: 0.9rem; margin: 0;">
-            Field agent verification portal
-        </p>
+    <div class="feature-card" style="border-left: 4px solid #2196F3;">
+        <div class="icon">📱</div>
+        <h4 style="color: #ffffff; font-size: 1.1rem;">Agent Portal</h4>
+        <p style="color: #b8c5d6; font-size: 0.9rem;">Field verification portal</p>
     </div>
     """, unsafe_allow_html=True)
-    if st.button("Open →", key="btn_agent"):
+    if st.button("Open →", key="btn_agent", use_container_width=True):
         st.switch_page("pages/3_📱_Agent_Portal.py")
 
 with col3:
     st.markdown("""
-    <div style="background: white; padding: 1.5rem; border-radius: 12px; 
-                box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
-                border-left: 4px solid #FF9800;">
-        <h3 style="margin: 0;">📊</h3>
-        <h4 style="margin: 0.5rem 0;">Confidence Score</h4>
-        <p style="color: #666; font-size: 0.9rem; margin: 0;">
-            View address confidence scores
-        </p>
+    <div class="feature-card" style="border-left: 4px solid #FF9800;">
+        <div class="icon">📊</div>
+        <h4 style="color: #ffffff; font-size: 1.1rem;">Confidence Score</h4>
+        <p style="color: #b8c5d6; font-size: 0.9rem;">View confidence scores</p>
     </div>
     """, unsafe_allow_html=True)
-    if st.button("Open →", key="btn_score"):
+    if st.button("Open →", key="btn_score", use_container_width=True):
         st.switch_page("pages/4_📊_Confidence_Score.py")
 
 with col4:
     st.markdown("""
-    <div style="background: white; padding: 1.5rem; border-radius: 12px; 
-                box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
-                border-left: 4px solid #9C27B0;">
-        <h3 style="margin: 0;">⚙️</h3>
-        <h4 style="margin: 0.5rem 0;">Admin Panel</h4>
-        <p style="color: #666; font-size: 0.9rem; margin: 0;">
-            System administration
-        </p>
+    <div class="feature-card" style="border-left: 4px solid #9C27B0;">
+        <div class="icon">⚙️</div>
+        <h4 style="color: #ffffff; font-size: 1.1rem;">Admin Panel</h4>
+        <p style="color: #b8c5d6; font-size: 0.9rem;">System administration</p>
     </div>
     """, unsafe_allow_html=True)
-    if st.button("Open →", key="btn_admin"):
+    if st.button("Open →", key="btn_admin", use_container_width=True):
         st.switch_page("pages/5_⚙️_Admin_Panel.py")
 
 st.divider()

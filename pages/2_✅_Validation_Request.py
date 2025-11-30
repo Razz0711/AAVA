@@ -13,6 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from utils.database import get_database
 from utils.digipin import DIGIPINValidator
+from utils.premium_theme import PREMIUM_CSS, PAGE_GRADIENTS
 
 st.set_page_config(
     page_title="Validation Request - AAVA",
@@ -24,38 +25,16 @@ st.set_page_config(
 db = get_database()
 validator = DIGIPINValidator()
 
-# Custom CSS
-st.markdown("""
-<style>
-    .validation-form {
-        background: white;
-        padding: 2rem;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-    .success-card {
-        background: #e8f5e9;
-        border-left: 4px solid #4CAF50;
-        padding: 1.5rem;
-        border-radius: 8px;
-        margin: 1rem 0;
-    }
-    .info-box {
-        background: #e3f2fd;
-        border-left: 4px solid #2196F3;
-        padding: 1rem;
-        border-radius: 8px;
-        margin: 1rem 0;
-    }
-</style>
-""", unsafe_allow_html=True)
+# Apply Premium Theme
+st.markdown(PREMIUM_CSS, unsafe_allow_html=True)
 
-# Header
-st.markdown("""
-<div style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); 
-            padding: 1.5rem 2rem; border-radius: 12px; color: white; margin-bottom: 2rem;">
-    <h1 style="margin: 0;">✅ Validation Request</h1>
-    <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Submit a new address validation request</p>
+# Premium Header
+st.markdown(f"""
+<div class="premium-header" style="background: linear-gradient(135deg, {PAGE_GRADIENTS['validation'][0]} 0%, {PAGE_GRADIENTS['validation'][1]} 50%, {PAGE_GRADIENTS['validation'][2]} 100%);">
+    <h1 style="margin: 0; display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 2rem;">✅</span> Validation Request
+    </h1>
+    <p style="margin: 0.5rem 0 0 0; font-size: 1rem; opacity: 0.95;">Submit a new address validation request</p>
 </div>
 """, unsafe_allow_html=True)
 

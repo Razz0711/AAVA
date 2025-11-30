@@ -14,6 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from utils.database import get_database
 from utils.digipin import DIGIPINValidator
+from utils.premium_theme import PREMIUM_CSS, PAGE_GRADIENTS
 
 st.set_page_config(
     page_title="Agent Portal - AAVA",
@@ -25,53 +26,8 @@ st.set_page_config(
 db = get_database()
 validator = DIGIPINValidator()
 
-# Custom CSS
-st.markdown("""
-<style>
-    .agent-header {
-        background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
-        padding: 1.5rem 2rem;
-        border-radius: 12px;
-        color: white;
-        margin-bottom: 2rem;
-    }
-    .task-card {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        margin-bottom: 1rem;
-        border-left: 4px solid #2196F3;
-    }
-    .task-card.urgent {
-        border-left-color: #f44336;
-    }
-    .task-card.high {
-        border-left-color: #ff9800;
-    }
-    .evidence-upload {
-        background: #f5f5f5;
-        padding: 1.5rem;
-        border-radius: 8px;
-        border: 2px dashed #ccc;
-        text-align: center;
-    }
-    .status-active {
-        background: #e8f5e9;
-        color: #2e7d32;
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.85rem;
-    }
-    .status-offline {
-        background: #ffebee;
-        color: #c62828;
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.85rem;
-    }
-</style>
-""", unsafe_allow_html=True)
+# Apply Premium Theme
+st.markdown(PREMIUM_CSS, unsafe_allow_html=True)
 
 # Session state for agent
 if 'logged_in_agent' not in st.session_state:
@@ -87,10 +43,12 @@ if 'current_task' not in st.session_state:
 
 def agent_login_form():
     """Display agent login form."""
-    st.markdown("""
-    <div class="agent-header">
-        <h1 style="margin: 0;">📱 Agent Portal</h1>
-        <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Field Verification Agent Login</p>
+    st.markdown(f"""
+    <div class="premium-header" style="background: linear-gradient(135deg, {PAGE_GRADIENTS['agent'][0]} 0%, {PAGE_GRADIENTS['agent'][1]} 50%, {PAGE_GRADIENTS['agent'][2]} 100%);">
+        <h1 style="margin: 0; display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 2rem;">📱</span> Agent Portal
+        </h1>
+        <p style="margin: 0.5rem 0 0 0; font-size: 1rem; opacity: 0.95;">Field Verification Agent Login</p>
     </div>
     """, unsafe_allow_html=True)
     

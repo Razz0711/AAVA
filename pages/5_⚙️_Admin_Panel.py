@@ -17,6 +17,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.database import get_database
 from utils.digipin import DIGIPINValidator
 from utils.confidence_score import SampleDataGenerator, get_grade
+from utils.premium_theme import PREMIUM_CSS, PAGE_GRADIENTS
 
 st.set_page_config(
     page_title="Admin Panel - AAVA",
@@ -28,41 +29,16 @@ st.set_page_config(
 db = get_database()
 validator = DIGIPINValidator()
 
-# Custom CSS
-st.markdown("""
-<style>
-    .admin-header {
-        background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
-        padding: 1.5rem 2rem;
-        border-radius: 12px;
-        color: white;
-        margin-bottom: 2rem;
-    }
-    .stat-card {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        text-align: center;
-    }
-    .stat-value {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #1e3a5f;
-    }
-    .stat-label {
-        font-size: 0.9rem;
-        color: #666;
-        margin-top: 0.5rem;
-    }
-</style>
-""", unsafe_allow_html=True)
+# Apply Premium Theme
+st.markdown(PREMIUM_CSS, unsafe_allow_html=True)
 
-# Header
-st.markdown("""
-<div class="admin-header">
-    <h1 style="margin: 0;">⚙️ Admin Panel</h1>
-    <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">System Administration & Management</p>
+# Premium Header
+st.markdown(f"""
+<div class="premium-header" style="background: linear-gradient(135deg, {PAGE_GRADIENTS['admin'][0]} 0%, {PAGE_GRADIENTS['admin'][1]} 50%, {PAGE_GRADIENTS['admin'][2]} 100%);">
+    <h1 style="margin: 0; display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 2rem;">⚙️</span> Admin Panel
+    </h1>
+    <p style="margin: 0.5rem 0 0 0; font-size: 1rem; opacity: 0.95;">System Administration & Management</p>
 </div>
 """, unsafe_allow_html=True)
 
