@@ -1175,17 +1175,9 @@ with cols[3]:
         st.session_state.pending_question = "show stats"
         st.rerun()
 
-# Elegant footer - above chat input with spacer
-st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)  # Spacer for chat input
+# Elegant footer badge - centered below quick actions
 st.markdown("""
-<div style="
-    position: fixed;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    z-index: 999;
-">
+<div style="text-align: center; margin: 30px 0 80px 0;">
     <span style="
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
