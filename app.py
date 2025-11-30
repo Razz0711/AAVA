@@ -49,6 +49,7 @@ DEVELOPER = {
     "email": "rajkumar648321@gmail.com",
     "phone": "7061001946",
     "linkedin": "https://www.linkedin.com/in/raj-kumar-9a149a280",
+    "github": "https://github.com/Razz0711",
     "role": "Data Science & ML Enthusiast | Stock Market Enthusiast"
 }
 
@@ -1168,7 +1169,8 @@ st.markdown(f"""
             <a href="tel:{DEVELOPER['phone']}" class="dev-link">📱 {DEVELOPER['phone']}</a>
         </div>
         <div class="dev-links">
-            <a href="{DEVELOPER['linkedin']}" target="_blank" class="dev-link">LinkedIn</a>
+            <a href="{DEVELOPER['linkedin']}" target="_blank" class="dev-link">🔗 LinkedIn</a>
+            <a href="{DEVELOPER['github']}" target="_blank" class="dev-link">💻 GitHub</a>
         </div>
     </div>
 </div>
