@@ -1040,7 +1040,7 @@ with st.sidebar:
     st.markdown('<div class="section-title">Settings</div>', unsafe_allow_html=True)
     
     with st.expander("🔑 API Key", expanded=False):
-        default_key = "AIzaSyBs2xc_tNi52GzTakIbMLRcsHy_tRSev7s"
+        default_key = "AIzaSyAgYKPD2td-TaSmpv7we9bemVh24AK981U"
         api_key = st.text_input(
             "Gemini API Key",
             type="password",
@@ -1089,8 +1089,11 @@ I can help you with:
 **Try asking:** "What is DIGIPIN?" or "encode 28.6139, 77.2090"
 """)
 
+# Always show chat input
+user_input = st.chat_input("Ask anything about AAVA...")
+
 # Get prompt from chat input or pending question
-prompt = pending_prompt if pending_prompt else st.chat_input("Ask anything about AAVA...")
+prompt = pending_prompt if pending_prompt else user_input
 
 # Process prompt (from either source)
 if prompt:
