@@ -48,7 +48,7 @@ DEVELOPER = {
     "name": "Raj Kumar",
     "email": "rajkumar648321@gmail.com",
     "phone": "7061001946",
-    "linkedin": "https://linkedin.com/in/rajkumar",
+    "linkedin": "https://www.linkedin.com/in/raj-kumar-9a149a280",
     "role": "Data Science & ML Enthusiast | Stock Market Enthusiast"
 }
 
