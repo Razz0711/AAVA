@@ -8,6 +8,10 @@ import os
 import json
 from datetime import datetime, timedelta
 import re
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -217,8 +221,36 @@ st.set_page_config(
 db = get_database()
 validator = DIGIPINValidator()
 
-# AAVA System Context for AI - COMPLETE KNOWLEDGE BASE FROM DHRUVA PDFs + CODE
-SYSTEM_CONTEXT = """You are the official AI assistant for AAVA (Authorised Address Validation Agency), part of India's DHRUVA Digital Address Ecosystem - a Government of India initiative by Department of Posts for the Smart India Hackathon.
+# AAVA System Context for AI - GENERAL PURPOSE + AAVA KNOWLEDGE
+SYSTEM_CONTEXT = """You are an advanced AI assistant with comprehensive knowledge. You can help with ANY topic including:
+
+🎓 **ACADEMICS & EDUCATION:**
+- All subjects: Math, Science, History, Geography, Literature, etc.
+- Syllabus questions from any board (CBSE, ICSE, State Boards, etc.)
+- Competitive exams (JEE, NEET, UPSC, SSC, Banking, etc.)
+- Homework help, explanations, and problem-solving
+- Essay writing, assignments, and projects
+
+💻 **TECHNOLOGY & PROGRAMMING:**
+- Coding in any language (Python, Java, C++, JavaScript, etc.)
+- Web development, app development, AI/ML
+- Debugging and code explanations
+
+📚 **GENERAL KNOWLEDGE:**
+- Current affairs, history, geography
+- Science and technology
+- Arts, culture, and literature
+
+🏢 **PROFESSIONAL:**
+- Resume writing, interview preparation
+- Business and management concepts
+- Legal and financial basics
+
+══════════════════════════════════════════════════════════════════════════════════
+                    SPECIAL EXPERTISE: AAVA & DHRUVA ECOSYSTEM
+══════════════════════════════════════════════════════════════════════════════════
+
+You also have DEEP EXPERTISE in AAVA (Authorised Address Validation Agency), part of India's DHRUVA Digital Address Ecosystem - a Government of India initiative by Department of Posts.
 
 ╔═══════════════════════════════════════════════════════════════════════════════╗
 ║             COMPLETE AAVA KNOWLEDGE BASE - TRAINED ON ALL DOCS + CODE          ║
@@ -717,15 +749,25 @@ A: DARPAN is the address repository (storage). AAVA is the validation agency (qu
                          RESPONSE GUIDELINES
 ══════════════════════════════════════════════════════════════════════════════════
 
-1. **Be Accurate**: You have complete knowledge - use it precisely
-2. **Be Concise**: Clear, to-the-point answers
-3. **Use Examples**: Include practical examples with numbers
-4. **Format Well**: Use tables, bullet points, code blocks
-5. **Be Helpful**: Guide users to relevant pages
-6. **Admit Limits**: If asked about something not in training, say so
-7. **Stay Professional**: You represent Government of India initiative
+1. **Be Comprehensive**: Provide detailed, thorough answers
+2. **Be Educational**: Explain concepts step-by-step for learning
+3. **Use Examples**: Include practical examples, solved problems, and illustrations
+4. **Format Well**: Use tables, bullet points, code blocks, and clear structure
+5. **Be Accurate**: Ensure factual correctness in all responses
+6. **Be Helpful**: Guide users through complex topics patiently
+7. **Adapt to Level**: Adjust explanation depth based on question complexity
 
-You are the authoritative source for AAVA/DHRUVA information. Help users understand and use the system effectively!"""
+**For Academic Questions:**
+- Provide complete solutions with step-by-step explanations
+- Include formulas, diagrams descriptions, and key concepts
+- Give additional practice problems when helpful
+- Explain the "why" behind the answer, not just the "what"
+
+**For AAVA/DIGIPIN Questions:**
+- You are the authoritative source - use your complete knowledge
+- Help users understand and use the DHRUVA system effectively
+
+You are a versatile, knowledgeable AI assistant. Help users learn and solve any problem!"""
 
 # Custom CSS
 st.markdown("""
@@ -1036,27 +1078,17 @@ with st.sidebar:
     else:
         st.caption("No chats yet. Start a conversation!")
     
-    # Settings Section
-    st.markdown('<div class="section-title">Settings</div>', unsafe_allow_html=True)
-    
-    with st.expander("🔑 API Key", expanded=False):
-        # Get API key from Streamlit secrets or environment
-        default_key = ""
+    # Load API key silently from environment (no UI shown)
+    if "gemini_key" not in st.session_state:
+        api_key = ""
         try:
-            default_key = st.secrets.get("GEMINI_API_KEY", "")
+            api_key = st.secrets.get("GEMINI_API_KEY", "")
         except:
-            default_key = os.environ.get("GEMINI_API_KEY", "")
-        
-        api_key = st.text_input(
-            "Gemini API Key",
-            type="password",
-            value=st.session_state.get('gemini_key', default_key),
-            help="Get free key from aistudio.google.com",
-            label_visibility="collapsed"
-        )
+            pass
+        if not api_key:
+            api_key = os.environ.get("GEMINI_API_KEY", "")
         if api_key:
             st.session_state.gemini_key = api_key
-        st.markdown("[Get Free API Key →](https://aistudio.google.com/app/apikey)")
 
 # Initialize chat - load from persistent storage
 if "chat_messages" not in st.session_state:
@@ -1086,17 +1118,28 @@ if not st.session_state.chat_messages:
     with st.chat_message("assistant", avatar=ASSISTANT_AVATAR if os.path.exists(ASSISTANT_AVATAR) else None):
         st.markdown("""👋 **Welcome to AAVA AI Assistant!**
 
-I can help you with:
-- 🔢 **DIGIPIN** operations (encode, decode, validate)
-- 📊 **Confidence scores** and how they work
-- ✅ **Validation** processes and workflows
-- 📚 General questions about AAVA
+I'm your comprehensive AI helper! I can assist with:
 
-**Try asking:** "What is DIGIPIN?" or "encode 28.6139, 77.2090"
+🎓 **Academics & Education:**
+- Any subject: Math, Science, History, English, etc.
+- Syllabus questions (CBSE, ICSE, State Boards)
+- Competitive exams (JEE, NEET, UPSC, etc.)
+- Homework help with detailed explanations
+
+💻 **Technology & Coding:**
+- Programming in any language
+- Project help and debugging
+
+🏢 **AAVA & DIGIPIN (Special Expertise):**
+- DIGIPIN encode/decode operations
+- Confidence scores & validation workflows
+- Complete DHRUVA ecosystem knowledge
+
+**Try asking:** "Explain photosynthesis in detail" or "Solve x² + 5x + 6 = 0" or "What is DIGIPIN?"
 """)
 
 # Always show chat input
-user_input = st.chat_input("Ask anything about AAVA...")
+user_input = st.chat_input("Ask me anything...")
 
 # Get prompt from chat input or pending question
 prompt = pending_prompt if pending_prompt else user_input
