@@ -1174,25 +1174,3 @@ with cols[3]:
     if st.button("📈 System Stats", use_container_width=True):
         st.session_state.pending_question = "show stats"
         st.rerun()
-
-# Footer - positioned above chat input using CSS
-st.markdown("""
-<style>
-.footer-text {
-    position: fixed;
-    bottom: 70px;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    color: #888;
-    font-size: 0.75rem;
-    z-index: 100;
-    background: rgba(255,255,255,0.9);
-    padding: 5px 15px;
-    border-radius: 10px;
-}
-</style>
-<div class="footer-text">
-    AAVA AI Assistant • 🧠 With Persistent Memory • DHRUVA Digital Address Ecosystem
-</div>
-""", unsafe_allow_html=True)
