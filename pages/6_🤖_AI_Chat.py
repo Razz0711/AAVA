@@ -1174,3 +1174,28 @@ with cols[3]:
     if st.button("📈 System Stats", use_container_width=True):
         st.session_state.pending_question = "show stats"
         st.rerun()
+
+# Elegant footer - above chat input with spacer
+st.markdown("<div style='height: 60px;'></div>", unsafe_allow_html=True)  # Spacer for chat input
+st.markdown("""
+<div style="
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 999;
+">
+    <span style="
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+    ">
+        🤖 AAVA AI • 🧠 Persistent Memory • 🇮🇳 DHRUVA Digital Address
+    </span>
+</div>
+""", unsafe_allow_html=True)
