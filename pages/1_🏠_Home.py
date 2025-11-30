@@ -14,6 +14,16 @@ st.set_page_config(
     layout="wide"
 )
 
+# Sidebar Navigation CSS
+st.markdown("""
+<style>
+    [data-testid="stSidebarNav"] ul { padding-top: 1rem; }
+    [data-testid="stSidebarNav"] li { margin-bottom: 0.5rem; }
+    [data-testid="stSidebarNav"] a { font-size: 1.05rem !important; padding: 0.6rem 1rem !important; }
+    [data-testid="stSidebarNav"] span { font-size: 1.05rem !important; }
+</style>
+""", unsafe_allow_html=True)
+
 # Header
 st.markdown("""
 <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); 

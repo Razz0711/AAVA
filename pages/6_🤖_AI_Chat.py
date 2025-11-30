@@ -772,6 +772,12 @@ You are a versatile, knowledgeable AI assistant. Help users learn and solve any 
 # Custom CSS
 st.markdown("""
 <style>
+    /* Sidebar Navigation */
+    [data-testid="stSidebarNav"] ul { padding-top: 1rem; }
+    [data-testid="stSidebarNav"] li { margin-bottom: 0.5rem; }
+    [data-testid="stSidebarNav"] a { font-size: 1.05rem !important; padding: 0.6rem 1rem !important; }
+    [data-testid="stSidebarNav"] span { font-size: 1.05rem !important; }
+    
     .chat-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 1.5rem 2rem;

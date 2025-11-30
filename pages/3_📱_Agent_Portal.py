@@ -28,6 +28,12 @@ validator = DIGIPINValidator()
 # Custom CSS
 st.markdown("""
 <style>
+    /* Sidebar Navigation */
+    [data-testid="stSidebarNav"] ul { padding-top: 1rem; }
+    [data-testid="stSidebarNav"] li { margin-bottom: 0.5rem; }
+    [data-testid="stSidebarNav"] a { font-size: 1.05rem !important; padding: 0.6rem 1rem !important; }
+    [data-testid="stSidebarNav"] span { font-size: 1.05rem !important; }
+    
     .agent-header {
         background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
         padding: 1.5rem 2rem;
