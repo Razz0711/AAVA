@@ -11,6 +11,7 @@ env/
 # IDE
 .vscode/
 .idea/
+.devcontainer/
 
 # Data files (keep structure, ignore content)
 data/*.db
@@ -22,3 +23,14 @@ Thumbs.db
 
 # Streamlit
 .streamlit/secrets.toml
+
+# PDF files
+*.pdf
+
+# Utility scripts
+generate_pdf.py
+make_pdf.py
+
+# Documentation (keep only README)
+DOCUMENTATION.md
+COMPLIANCE_REPORT.md
