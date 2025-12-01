@@ -457,6 +457,7 @@ with tab3:
             for agent in filtered_agents:
                 agent_id = agent.get('id', '')
                 agent_name = agent.get('name', 'Unknown')
+                agent_password = agent.get('password', '') or '(Not Set)'
                 
                 with st.container():
                     col_info, col_actions = st.columns([3, 1])
@@ -466,7 +467,7 @@ with tab3:
                         st.caption(f"🆔 `{agent_id}` | 📧 {agent.get('email', 'N/A')} | 📱 {agent.get('phone', 'N/A')}")
                         perf = agent.get('performance_score', 0) * 100
                         status = '✅ Active' if agent.get('active') else '❌ Inactive'
-                        st.caption(f"📊 {perf:.0f}% | {status}")
+                        st.caption(f"📊 {perf:.0f}% | {status} | 🔑 Password: `{agent_password}`")
                     
                     with col_actions:
                         col_pwd, col_del = st.columns(2)
