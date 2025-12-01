@@ -586,15 +586,16 @@ class DatabaseManager:
             
             cursor.execute("""
                 INSERT INTO agents (
-                    id, name, email, phone, photo_url,
+                    id, name, email, phone, password, photo_url,
                     certification_date, certification_expiry, active,
                     performance_score
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 agent_id,
                 data.get('name'),
                 email,
                 phone,
+                data.get('password'),
                 data.get('photo_url'),
                 data.get('certification_date'),
                 data.get('certification_expiry'),

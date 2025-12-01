@@ -11,7 +11,32 @@ import os
 from datetime import datetime, timedelta
 import random
 import json
+import string
 from dotenv import load_dotenv
+
+def generate_strong_password(length=12):
+    """Generate a strong random password."""
+    # Include uppercase, lowercase, digits, and special characters
+    uppercase = string.ascii_uppercase
+    lowercase = string.ascii_lowercase
+    digits = string.digits
+    special = "@#$%&*!"
+    
+    # Ensure at least one of each type
+    password = [
+        random.choice(uppercase),
+        random.choice(lowercase),
+        random.choice(digits),
+        random.choice(special)
+    ]
+    
+    # Fill remaining with random mix
+    all_chars = uppercase + lowercase + digits + special
+    password.extend(random.choice(all_chars) for _ in range(length - 4))
+    
+    # Shuffle the password
+    random.shuffle(password)
+    return ''.join(password)
 
 # Load environment variables
 load_dotenv()
@@ -528,17 +553,23 @@ with tab3:
             if st.form_submit_button("➕ Add Agent", use_container_width=True):
                 if name and email:
                     try:
+                        # Generate strong password
+                        auto_password = generate_strong_password()
+                        
                         agent_id = db.create_agent({
                             'name': name,
                             'email': email,
                             'phone': phone,
+                            'password': auto_password,
                             'certification_date': cert_date.isoformat(),
                             'certification_expiry': cert_expiry.isoformat(),
                             'active': 1,
                             'performance_score': 0.8
                         })
-                        st.success(f"✅ Agent created: {agent_id}")
-                        st.rerun()
+                        st.success(f"✅ Agent created!")
+                        st.info(f"🆔 Agent ID: `{agent_id}`")
+                        st.info(f"🔑 Password: `{auto_password}`")
+                        st.warning("⚠️ Please save this password - it won't be shown again!")
                     except Exception as e:
                         st.error(f"Error: {str(e)}")
                 else:
