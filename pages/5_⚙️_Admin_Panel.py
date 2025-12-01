@@ -554,16 +554,20 @@ with tab4:
                 if existing:
                     agent_ids.append(existing['id'])
                 else:
-                    agent_id = db.create_agent({
-                        'name': name,
-                        'email': email,
-                        'phone': f"+91-98{random.randint(10000000, 99999999)}",
-                        'certification_date': (datetime.now() - timedelta(days=random.randint(30, 365))).isoformat(),
-                        'certification_expiry': (datetime.now() + timedelta(days=random.randint(180, 365))).isoformat(),
-                        'active': 1,
-                        'performance_score': random.uniform(0.7, 0.95)
-                    })
-                    agent_ids.append(agent_id)
+                    try:
+                        agent_id = db.create_agent({
+                            'name': name,
+                            'email': email,
+                            'phone': f"+91-98{random.randint(10000000, 99999999)}",
+                            'certification_date': (datetime.now() - timedelta(days=random.randint(30, 365))).isoformat(),
+                            'certification_expiry': (datetime.now() + timedelta(days=random.randint(180, 365))).isoformat(),
+                            'active': 1,
+                            'performance_score': random.uniform(0.7, 0.95)
+                        })
+                        agent_ids.append(agent_id)
+                    except ValueError:
+                        # Agent with same email/phone exists, skip
+                        pass
             
             progress.progress(0.2)
             

@@ -197,7 +197,7 @@ class DatabaseManager:
                     id TEXT PRIMARY KEY,
                     name TEXT NOT NULL,
                     email TEXT UNIQUE,
-                    phone TEXT,
+                    phone TEXT UNIQUE,
                     password TEXT,
                     photo_url TEXT,
                     certification_date DATE,
@@ -560,9 +560,30 @@ class DatabaseManager:
     def create_agent(self, data: Dict) -> str:
         """Create a new agent."""
         agent_id = data.get('id') or self._generate_id("AGT")
+        email = data.get('email')
+        phone = data.get('phone')
         
+        # Check for duplicate email or phone
         with self.get_connection() as conn:
             cursor = conn.cursor()
+            
+            # Check duplicate email
+            if email:
+                cursor.execute("SELECT id FROM agents WHERE email = ?", (email,))
+                if cursor.fetchone():
+                    raise ValueError(f"Email '{email}' already exists")
+            
+            # Check duplicate phone
+            if phone:
+                cursor.execute("SELECT id FROM agents WHERE phone = ?", (phone,))
+                if cursor.fetchone():
+                    raise ValueError(f"Phone '{phone}' already exists")
+            
+            # Check duplicate agent_id
+            cursor.execute("SELECT id FROM agents WHERE id = ?", (agent_id,))
+            if cursor.fetchone():
+                raise ValueError(f"Agent ID '{agent_id}' already exists")
+            
             cursor.execute("""
                 INSERT INTO agents (
                     id, name, email, phone, photo_url,
@@ -572,8 +593,8 @@ class DatabaseManager:
             """, (
                 agent_id,
                 data.get('name'),
-                data.get('email'),
-                data.get('phone'),
+                email,
+                phone,
                 data.get('photo_url'),
                 data.get('certification_date'),
                 data.get('certification_expiry'),
