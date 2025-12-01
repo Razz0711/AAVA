@@ -198,6 +198,7 @@ class DatabaseManager:
                     name TEXT NOT NULL,
                     email TEXT UNIQUE,
                     phone TEXT,
+                    password TEXT,
                     photo_url TEXT,
                     certification_date DATE,
                     certification_expiry DATE,
@@ -211,6 +212,12 @@ class DatabaseManager:
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
+            
+            # Add password column if not exists (for existing databases)
+            try:
+                cursor.execute("ALTER TABLE agents ADD COLUMN password TEXT")
+            except:
+                pass  # Column already exists
             
             # Deliveries table
             cursor.execute("""
@@ -590,6 +597,29 @@ class DatabaseManager:
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM agents WHERE email = ?", (email,))
             return self._row_to_dict(cursor.fetchone())
+    
+    def delete_agent(self, agent_id: str) -> bool:
+        """Delete an agent."""
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                # Update validations to remove agent reference
+                try:
+                    cursor.execute("UPDATE validations SET assigned_agent_id = NULL WHERE assigned_agent_id = ?", (agent_id,))
+                except:
+                    pass
+                # Update verifications to remove agent reference
+                try:
+                    cursor.execute("UPDATE verifications SET agent_id = NULL WHERE agent_id = ?", (agent_id,))
+                except:
+                    pass
+                # Delete the agent
+                cursor.execute("DELETE FROM agents WHERE id = ?", (agent_id,))
+                conn.commit()
+                return True
+        except Exception as e:
+            print(f"Error deleting agent: {e}")
+            return False
     
     def update_agent(self, agent_id: str, data: Dict) -> bool:
         """Update an agent record."""

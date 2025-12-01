@@ -310,28 +310,107 @@ with tab2:
 with tab3:
     st.markdown("### 👥 Agent Management")
     
+    # Search Section
+    st.markdown("#### 🔍 Search Agent")
+    search_col1, search_col2 = st.columns([3, 1])
+    
+    with search_col1:
+        search_query = st.text_input(
+            "Search by Agent ID, Name, Email, or Phone",
+            placeholder="Enter agent ID, name, email, or phone...",
+            key="agent_search"
+        )
+    
+    with search_col2:
+        search_type = st.selectbox(
+            "Search in",
+            options=["All", "Agent ID", "Name", "Email", "Phone"],
+            key="agent_search_type"
+        )
+    
+    # Get all agents
+    agents = db.get_all_agents()
+    
+    # Filter agents based on search
+    filtered_agents = agents
+    if search_query and agents:
+        search_lower = search_query.lower()
+        search_upper = search_query.upper()
+        if search_type == "Agent ID":
+            filtered_agents = [a for a in agents if search_upper in a.get('id', '').upper()]
+        elif search_type == "Name":
+            filtered_agents = [a for a in agents if search_lower in a.get('name', '').lower()]
+        elif search_type == "Email":
+            filtered_agents = [a for a in agents if search_lower in a.get('email', '').lower()]
+        elif search_type == "Phone":
+            filtered_agents = [a for a in agents if search_query in a.get('phone', '')]
+        else:  # All
+            filtered_agents = [
+                a for a in agents 
+                if search_lower in a.get('name', '').lower() 
+                or search_lower in a.get('email', '').lower() 
+                or search_query in a.get('phone', '')
+                or search_upper in a.get('id', '').upper()
+            ]
+    
+    st.divider()
+    
     col1, col2 = st.columns([2, 1])
     
     with col1:
-        st.markdown("#### Agent List")
+        st.markdown(f"#### Agent List ({len(filtered_agents)} found)")
         
-        agents = db.get_all_agents()
-        
-        if agents:
-            df = pd.DataFrame([
-                {
-                    'ID': a.get('id', ''),
-                    'Name': a.get('name', ''),
-                    'Email': a.get('email', ''),
-                    'Phone': a.get('phone', ''),
-                    'Performance': f"{a.get('performance_score', 0)*100:.0f}%",
-                    'Active': '✅' if a.get('active') else '❌',
-                    'Cert. Expiry': a.get('certification_expiry', 'N/A')
-                }
-                for a in agents
-            ])
-            
-            st.dataframe(df, use_container_width=True, hide_index=True)
+        if filtered_agents:
+            for agent in filtered_agents:
+                agent_id = agent.get('id', '')
+                agent_name = agent.get('name', 'Unknown')
+                
+                with st.container():
+                    col_info, col_actions = st.columns([3, 1])
+                    
+                    with col_info:
+                        st.markdown(f"**{agent_name}**")
+                        st.caption(f"🆔 `{agent_id}` | 📧 {agent.get('email', 'N/A')} | 📱 {agent.get('phone', 'N/A')}")
+                        perf = agent.get('performance_score', 0) * 100
+                        status = '✅ Active' if agent.get('active') else '❌ Inactive'
+                        st.caption(f"📊 {perf:.0f}% | {status}")
+                    
+                    with col_actions:
+                        col_pwd, col_del = st.columns(2)
+                        
+                        with col_pwd:
+                            with st.popover("🔑"):
+                                st.markdown(f"**Set Password for {agent_name}**")
+                                new_pwd = st.text_input("New Password", type="password", key=f"pwd_{agent_id}")
+                                confirm_pwd = st.text_input("Confirm Password", type="password", key=f"cpwd_{agent_id}")
+                                if st.button("✅ Save", key=f"save_pwd_{agent_id}"):
+                                    if new_pwd and confirm_pwd:
+                                        if new_pwd == confirm_pwd:
+                                            if len(new_pwd) >= 4:
+                                                db.update_agent(agent_id, {'password': new_pwd})
+                                                st.success("Password saved!")
+                                                st.rerun()
+                                            else:
+                                                st.error("Min 4 characters!")
+                                        else:
+                                            st.error("Passwords don't match!")
+                                    else:
+                                        st.warning("Enter password")
+                        
+                        with col_del:
+                            with st.popover("🗑️"):
+                                st.warning(f"Delete **{agent_name}**?")
+                                st.caption("This action cannot be undone.")
+                                if st.button("✅ Yes, Delete", key=f"del_{agent_id}", type="primary"):
+                                    if db.delete_agent(agent_id):
+                                        st.success("Agent deleted!")
+                                        st.rerun()
+                                    else:
+                                        st.error("Failed to delete")
+                    
+                    st.divider()
+        elif search_query:
+            st.warning(f"No agents found matching '{search_query}'")
         else:
             st.info("No agents registered")
     
