@@ -52,38 +52,12 @@ if not st.session_state.admin_logged_in:
     # Professional Login Page CSS
     st.markdown("""
     <style>
-        .login-container {
-            max-width: 420px;
-            margin: 0 auto;
-            padding: 2.5rem;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-        }
-        .login-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        .login-icon {
-            width: 80px;
-            height: 80px;
+        .admin-login-header {
             background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 1rem;
-            font-size: 2.5rem;
-        }
-        .login-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #1e3a5f;
-            margin: 0;
-        }
-        .login-subtitle {
-            color: #666;
-            margin-top: 0.5rem;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            color: white;
+            margin-bottom: 2rem;
         }
         .login-footer {
             text-align: center;
@@ -96,33 +70,19 @@ if not st.session_state.admin_logged_in:
             font-size: 0.85rem;
             margin: 0.25rem 0;
         }
-        .stButton > button {
-            background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%) !important;
-            color: white !important;
-            border: none !important;
-            padding: 0.75rem 2rem !important;
-            font-size: 1rem !important;
-            font-weight: 600 !important;
-            border-radius: 8px !important;
-            transition: transform 0.2s, box-shadow 0.2s !important;
-        }
-        .stButton > button:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 4px 12px rgba(156, 39, 176, 0.4) !important;
-        }
     </style>
+    """, unsafe_allow_html=True)
+    
+    # Purple header banner
+    st.markdown("""
+    <div class="admin-login-header">
+        <h1 style="margin: 0;">⚙️ Admin Panel</h1>
+        <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">System Administration Login</p>
+    </div>
     """, unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([1, 1.5, 1])
     with col2:
-        st.markdown("""
-        <div class="login-header">
-            <div class="login-icon">🔐</div>
-            <h1 class="login-title">Admin Panel</h1>
-            <p class="login-subtitle">System Administration Access</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
         with st.form("admin_login"):
             st.markdown("##### 👤 Username")
             username = st.text_input("Username", placeholder="Enter admin username", label_visibility="collapsed")
