@@ -36,25 +36,31 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin_raj@")
 if 'admin_logged_in' not in st.session_state:
     st.session_state.admin_logged_in = False
 
+# Custom CSS for login
+st.markdown("""
+<style>
+    .admin-login-header {
+        background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+        padding: 1.5rem 2rem;
+        border-radius: 12px;
+        color: white;
+        margin-bottom: 2rem;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # Admin Login Check
 if not st.session_state.admin_logged_in:
     st.markdown("""
-    <style>
-        .login-container {
-            max-width: 400px;
-            margin: 100px auto;
-            padding: 2rem;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-    </style>
+    <div class="admin-login-header">
+        <h1 style="margin: 0;">⚙️ Admin Panel</h1>
+        <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">System Administration Login</p>
+    </div>
     """, unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.markdown("### 🔐 Admin Login")
-        st.markdown("---")
         
         with st.form("admin_login"):
             username = st.text_input("Username", placeholder="Enter admin username")
@@ -67,12 +73,23 @@ if not st.session_state.admin_logged_in:
                     st.rerun()
                 else:
                     st.error("❌ Invalid credentials!")
+        
+        st.divider()
+        
+        st.markdown("""
+        <div style="text-align: center; color: #666; font-size: 0.9rem;">
+            <p>🔐 Secure admin authentication</p>
+            <p>Contact super admin if you forgot your credentials</p>
+        </div>
+        """, unsafe_allow_html=True)
     
     st.stop()
 
-# Logout button in sidebar
+# Logout button in sidebar (when logged in)
 with st.sidebar:
-    if st.button("🚪 Logout Admin", use_container_width=True):
+    st.markdown("---")
+    st.markdown("👤 **Admin**")
+    if st.button("🚪 Logout", use_container_width=True, key="admin_logout"):
         st.session_state.admin_logged_in = False
         st.rerun()
 
