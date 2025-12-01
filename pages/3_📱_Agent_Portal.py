@@ -181,25 +181,33 @@ def agent_dashboard():
     """Display agent dashboard with tasks."""
     agent = st.session_state.logged_in_agent
     
-    # Header with agent info
-    st.markdown(f"""
-    <div class="agent-header">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h1 style="margin: 0;">📱 Agent Portal</h1>
-                <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">
-                    Welcome, {agent.get('name', 'Agent')}
-                </p>
-            </div>
-            <div style="text-align: right;">
-                <span class="status-active">🟢 Active</span>
-                <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; opacity: 0.9;">
-                    ID: {agent.get('id', 'N/A')}
-                </p>
+    # Header with agent info and logout button
+    col_header, col_logout = st.columns([5, 1])
+    with col_header:
+        st.markdown(f"""
+        <div class="agent-header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 style="margin: 0;">📱 Agent Portal</h1>
+                    <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">
+                        Welcome, {agent.get('name', 'Agent')}
+                    </p>
+                </div>
+                <div style="text-align: right;">
+                    <span class="status-active">🟢 Active</span>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; opacity: 0.9;">
+                        ID: {agent.get('id', 'N/A')}
+                    </p>
+                </div>
             </div>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
+    with col_logout:
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("🚪 Logout", use_container_width=True, key="agent_logout_main"):
+            st.session_state.logged_in_agent = None
+            st.session_state.current_task = None
+            st.rerun()
     
     # Sidebar for agent info
     with st.sidebar:
@@ -210,13 +218,6 @@ def agent_dashboard():
         **Email:** {agent.get('email', 'N/A')}  
         **Performance:** {agent.get('performance_score', 0) * 100:.0f}%
         """)
-        
-        st.divider()
-        
-        if st.button("🚪 Logout", use_container_width=True):
-            st.session_state.logged_in_agent = None
-            st.session_state.current_task = None
-            st.rerun()
     
     # Main tabs
     tab1, tab2, tab3 = st.tabs(["📋 Assigned Tasks", "✅ Submit Verification", "📊 My Stats"])
@@ -686,15 +687,6 @@ def agent_dashboard():
 # =============================================================================
 
 if st.session_state.logged_in_agent:
-    # Logout button in sidebar
-    with st.sidebar:
-        st.markdown("---")
-        agent_name = st.session_state.logged_in_agent.get('name', 'Agent')
-        st.markdown(f"👤 **{agent_name}**")
-        if st.button("🚪 Logout", use_container_width=True, key="agent_logout"):
-            st.session_state.logged_in_agent = None
-            st.session_state.current_task = None
-            st.rerun()
     agent_dashboard()
 else:
     agent_login_form()
