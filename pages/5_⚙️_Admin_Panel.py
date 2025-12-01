@@ -110,14 +110,6 @@ if not st.session_state.admin_logged_in:
     
     st.stop()
 
-# Logout button in sidebar (when logged in)
-with st.sidebar:
-    st.markdown("---")
-    st.markdown("👤 **Admin**")
-    if st.button("🚪 Logout", use_container_width=True, key="admin_logout"):
-        st.session_state.admin_logged_in = False
-        st.rerun()
-
 # Initialize
 db = get_database()
 validator = DIGIPINValidator()
@@ -158,13 +150,20 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Header
-st.markdown("""
-<div class="admin-header">
-    <h1 style="margin: 0;">⚙️ Admin Panel</h1>
-    <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">System Administration & Management</p>
-</div>
-""", unsafe_allow_html=True)
+# Header with logout button
+col_header, col_logout = st.columns([5, 1])
+with col_header:
+    st.markdown("""
+    <div class="admin-header">
+        <h1 style="margin: 0;">⚙️ Admin Panel</h1>
+        <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">System Administration & Management</p>
+    </div>
+    """, unsafe_allow_html=True)
+with col_logout:
+    st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("🚪 Logout", use_container_width=True, key="admin_logout"):
+        st.session_state.admin_logged_in = False
+        st.rerun()
 
 # Tabs
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
