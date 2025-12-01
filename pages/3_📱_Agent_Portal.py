@@ -686,6 +686,15 @@ def agent_dashboard():
 # =============================================================================
 
 if st.session_state.logged_in_agent:
+    # Logout button in sidebar
+    with st.sidebar:
+        st.markdown("---")
+        agent_name = st.session_state.logged_in_agent.get('name', 'Agent')
+        st.markdown(f"👤 **{agent_name}**")
+        if st.button("🚪 Logout", use_container_width=True, key="agent_logout"):
+            st.session_state.logged_in_agent = None
+            st.session_state.current_task = None
+            st.rerun()
     agent_dashboard()
 else:
     agent_login_form()
