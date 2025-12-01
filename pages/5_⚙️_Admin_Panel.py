@@ -11,6 +11,10 @@ import os
 from datetime import datetime, timedelta
 import random
 import json
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -24,9 +28,9 @@ st.set_page_config(
     layout="wide"
 )
 
-# Admin credentials
-ADMIN_USERNAME = "admin_raj"
-ADMIN_PASSWORD = "admin_raj@"
+# Admin credentials from environment variables (with fallback)
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin_raj")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin_raj@")
 
 # Initialize session state for admin login
 if 'admin_logged_in' not in st.session_state:
