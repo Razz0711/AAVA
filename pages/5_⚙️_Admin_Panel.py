@@ -40,39 +40,64 @@ if 'admin_logged_in' not in st.session_state:
 if not st.session_state.admin_logged_in:
     st.markdown("""
     <style>
-        .login-container {
-            max-width: 400px;
-            margin: 100px auto;
+        .admin-login-header {
+            background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
             padding: 2rem;
+            border-radius: 12px;
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .login-box {
             background: white;
+            padding: 2rem;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: 1px solid #e0e0e0;
         }
     </style>
     """, unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.markdown("### 🔐 Admin Login")
-        st.markdown("---")
+        st.markdown("""
+        <div class="admin-login-header">
+            <h1 style="margin: 0;">🔐 Admin Panel</h1>
+            <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">System Administration Access</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown('<div class="login-box">', unsafe_allow_html=True)
+        st.markdown("#### Enter Admin Credentials")
         
         with st.form("admin_login"):
-            username = st.text_input("Username", placeholder="Enter admin username")
-            password = st.text_input("Password", type="password", placeholder="Enter password")
+            username = st.text_input("👤 Username", placeholder="Enter admin username")
+            password = st.text_input("🔑 Password", type="password", placeholder="Enter password")
+            st.markdown("")
             
-            if st.form_submit_button("🔓 Login", use_container_width=True):
+            if st.form_submit_button("🔓 Login", use_container_width=True, type="primary"):
                 if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
                     st.session_state.admin_logged_in = True
                     st.success("✅ Login successful!")
                     st.rerun()
                 else:
-                    st.error("❌ Invalid credentials!")
+                    st.error("❌ Invalid username or password!")
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        st.markdown("""
+        <div style="text-align: center; margin-top: 1.5rem; color: #666;">
+            <p>🔒 Secure admin access only</p>
+        </div>
+        """, unsafe_allow_html=True)
     
     st.stop()
 
 # Logout button in sidebar
 with st.sidebar:
-    if st.button("🚪 Logout Admin", use_container_width=True):
+    st.markdown("---")
+    st.markdown("👤 **Admin**")
+    if st.button("🚪 Logout", use_container_width=True, key="admin_logout"):
         st.session_state.admin_logged_in = False
         st.rerun()
 
