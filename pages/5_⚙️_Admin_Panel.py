@@ -24,6 +24,54 @@ st.set_page_config(
     layout="wide"
 )
 
+# Admin credentials
+ADMIN_USERNAME = "admin_raj"
+ADMIN_PASSWORD = "admin_raj@"
+
+# Initialize session state for admin login
+if 'admin_logged_in' not in st.session_state:
+    st.session_state.admin_logged_in = False
+
+# Admin Login Check
+if not st.session_state.admin_logged_in:
+    st.markdown("""
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.markdown("### 🔐 Admin Login")
+        st.markdown("---")
+        
+        with st.form("admin_login"):
+            username = st.text_input("Username", placeholder="Enter admin username")
+            password = st.text_input("Password", type="password", placeholder="Enter password")
+            
+            if st.form_submit_button("🔓 Login", use_container_width=True):
+                if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+                    st.session_state.admin_logged_in = True
+                    st.success("✅ Login successful!")
+                    st.rerun()
+                else:
+                    st.error("❌ Invalid credentials!")
+    
+    st.stop()
+
+# Logout button in sidebar
+with st.sidebar:
+    if st.button("🚪 Logout Admin", use_container_width=True):
+        st.session_state.admin_logged_in = False
+        st.rerun()
+
 # Initialize
 db = get_database()
 validator = DIGIPINValidator()
