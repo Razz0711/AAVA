@@ -36,9 +36,15 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin_raj@")
 if 'admin_logged_in' not in st.session_state:
     st.session_state.admin_logged_in = False
 
-# Custom CSS for login
+# Custom CSS for sidebar and login (load always)
 st.markdown("""
 <style>
+    /* Sidebar Navigation */
+    [data-testid="stSidebarNav"] ul { padding-top: 1rem; }
+    [data-testid="stSidebarNav"] li { margin-bottom: 0.5rem; }
+    [data-testid="stSidebarNav"] a { font-size: 1.05rem !important; padding: 0.6rem 1rem !important; }
+    [data-testid="stSidebarNav"] span { font-size: 1.05rem !important; }
+    
     .admin-login-header {
         background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
         padding: 1.5rem 2rem;
