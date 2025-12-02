@@ -1,6 +1,6 @@
 # pages/2_✅_Validation_Request.py
 # AAVA - Validation Request Page
-# Submit new address validation requests (Agent Login Required)
+# Submit new address validation requests (Agent + Admin access)
 
 import streamlit as st
 import sys
@@ -24,9 +24,11 @@ st.set_page_config(
 db = get_database()
 validator = DIGIPINValidator()
 
-# Initialize session state for agent login
+# Initialize session states
 if 'logged_in_agent' not in st.session_state:
     st.session_state.logged_in_agent = None
+if 'admin_logged_in' not in st.session_state:
+    st.session_state.admin_logged_in = False
 
 # Custom CSS
 st.markdown("""
@@ -61,41 +63,60 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =============================================================================
-# AGENT LOGIN CHECK
+# ACCESS CHECK - Agent OR Admin required
 # =============================================================================
 
-if st.session_state.logged_in_agent is None:
+is_agent_logged_in = st.session_state.logged_in_agent is not None
+is_admin_logged_in = st.session_state.admin_logged_in
+
+if not is_agent_logged_in and not is_admin_logged_in:
     # Show login required message
     st.markdown("""
     <div style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); 
                 padding: 1.5rem 2rem; border-radius: 12px; color: white; margin-bottom: 2rem;">
         <h1 style="margin: 0;">✅ Validation Request</h1>
-        <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Agent Login Required</p>
+        <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Login Required</p>
     </div>
     """, unsafe_allow_html=True)
     
-    st.warning("🔐 **Agent Login Required**")
-    st.info("Please login through the **Agent Portal** to access this page.")
+    st.warning("🔐 **Login Required**")
+    st.info("This page is accessible to **Agents** and **Admins** only.")
     
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button("🔑 Go to Agent Portal", use_container_width=True, type="primary"):
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("🔑 Agent Login", use_container_width=True, type="primary"):
             st.switch_page("pages/3_📱_Agent_Portal.py")
+    with col2:
+        if st.button("⚙️ Admin Login", use_container_width=True):
+            st.switch_page("pages/5_⚙️_Admin_Panel.py")
     
     st.stop()
+
+# Determine user type for display
+user_type = "Admin" if is_admin_logged_in else "Agent"
+user_name = "Administrator" if is_admin_logged_in else st.session_state.logged_in_agent.get('name', 'Agent')
 
 # =============================================================================
 # LOGGED IN - SHOW MAIN CONTENT
 # =============================================================================
 
-agent = st.session_state.logged_in_agent
+agent = st.session_state.logged_in_agent if is_agent_logged_in else {'name': 'Administrator', 'agent_id': 'ADMIN'}
 
-# Header with agent info
+# Header with user info
 st.markdown(f"""
 <div style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); 
             padding: 1.5rem 2rem; border-radius: 12px; color: white; margin-bottom: 2rem;">
-    <h1 style="margin: 0;">✅ Validation Request</h1>
-    <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Welcome, {agent.get('name', 'Agent')} | Submit new address validation requests</p>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1 style="margin: 0;">✅ Validation Request</h1>
+            <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Submit new address validation requests</p>
+        </div>
+        <div style="text-align: right; background: rgba(255,255,255,0.2); padding: 0.5rem 1rem; border-radius: 8px;">
+            <small style="opacity: 0.8;">Logged in as</small><br>
+            <strong>{user_name}</strong>
+            <span style="background: rgba(255,255,255,0.3); padding: 2px 8px; border-radius: 4px; margin-left: 8px; font-size: 0.8em;">{user_type}</span>
+        </div>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
