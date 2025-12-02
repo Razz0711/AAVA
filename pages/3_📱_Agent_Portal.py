@@ -238,7 +238,47 @@ def agent_dashboard():
             if t.get('status') in ['PENDING', 'IN_PROGRESS']
         ]
         
-        if not active_tasks:
+        # Also get UNASSIGNED pending validations (available to claim)
+        all_validations = db.get_all_validations()
+        unassigned_tasks = [
+            v for v in all_validations 
+            if v.get('status') == 'PENDING' and not v.get('assigned_agent_id')
+        ]
+        
+        # Show unassigned tasks first (available to claim)
+        if unassigned_tasks:
+            st.markdown("#### 🆕 Available Tasks (Claim to Start)")
+            st.info(f"📢 **{len(unassigned_tasks)} validation request(s)** waiting to be claimed!")
+            
+            for task in unassigned_tasks[:5]:  # Show max 5
+                priority = task.get('priority', 'NORMAL')
+                priority_badge = {
+                    'LOW': '🟢 Low',
+                    'NORMAL': '🔵 Normal', 
+                    'HIGH': '🟠 High',
+                    'URGENT': '🔴 Urgent'
+                }.get(priority, '🔵 Normal')
+                
+                with st.container():
+                    col_info, col_btn = st.columns([3, 1])
+                    with col_info:
+                        st.markdown(f"""
+                        **{task.get('id')}** | {priority_badge}  
+                        📍 {task.get('digipin', 'N/A')} | {task.get('descriptive_address', 'No address')[:50]}...
+                        """)
+                    with col_btn:
+                        if st.button("✋ Claim", key=f"claim_{task.get('id')}", type="primary"):
+                            # Assign to this agent
+                            db.update_validation(task.get('id'), {
+                                'assigned_agent_id': agent.get('id'),
+                                'status': 'IN_PROGRESS'
+                            })
+                            st.success(f"✅ Task {task.get('id')} claimed!")
+                            st.rerun()
+            
+            st.divider()
+        
+        if not active_tasks and not unassigned_tasks:
             # Create sample tasks for demo
             st.info("📋 No active tasks assigned. Creating demo tasks...")
             
@@ -278,7 +318,9 @@ def agent_dashboard():
             
             st.rerun()
         
-        else:
+        # Show assigned/claimed tasks
+        if active_tasks:
+            st.markdown("#### ✅ Your Active Tasks")
             col1, col2 = st.columns([2, 1])
             
             with col1:
