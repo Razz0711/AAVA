@@ -59,28 +59,43 @@ def get_place_name(lat, lon):
             address = data.get('address', {})
             display_name = data.get('display_name', '')
             
-            # Build a clean short address
-            parts = []
-            if address.get('amenity'):
-                parts.append(address['amenity'])
-            if address.get('building'):
-                parts.append(address['building'])
-            if address.get('road'):
-                parts.append(address['road'])
-            if address.get('neighbourhood'):
-                parts.append(address['neighbourhood'])
-            if address.get('suburb'):
-                parts.append(address['suburb'])
-            if address.get('city') or address.get('town') or address.get('village'):
-                parts.append(address.get('city') or address.get('town') or address.get('village'))
-            if address.get('state'):
-                parts.append(address['state'])
+            # Get the most specific place name available
+            place_name = (
+                address.get('amenity') or 
+                address.get('building') or 
+                address.get('house_name') or
+                address.get('tourism') or
+                address.get('leisure') or
+                address.get('office') or
+                address.get('shop') or
+                address.get('man_made') or
+                address.get('road') or
+                address.get('neighbourhood') or
+                address.get('suburb') or
+                address.get('village') or
+                address.get('town') or
+                address.get('city') or
+                'Unknown'
+            )
+            
+            # Get area info
+            area = address.get('suburb') or address.get('neighbourhood') or address.get('locality') or ''
+            city = address.get('city') or address.get('town') or address.get('village') or address.get('county') or ''
+            state = address.get('state') or ''
+            
+            # Build short address (place + area + city)
+            short_parts = [p for p in [place_name, area, city] if p and p != place_name]
+            short_address = ', '.join([place_name] + short_parts[:2])
             
             return {
-                'short': ', '.join(parts[:4]) if parts else 'Location found',
-                'full': display_name
+                'place': place_name,
+                'short': short_address,
+                'full': display_name,
+                'area': area,
+                'city': city,
+                'state': state
             }
-    except:
+    except Exception as e:
         pass
     return None
 
@@ -791,11 +806,15 @@ with tab2:
                     if place_info:
                         st.markdown(f"""
                         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                                    padding: 1rem; border-radius: 10px; color: white; text-align: center; margin: 1rem 0;">
-                            <h4 style="margin: 0;">🏢 Place Name</h4>
-                            <p style="font-size: 1.1rem; margin: 0.5rem 0; font-weight: bold;">{place_info['short']}</p>
+                                    padding: 1.2rem; border-radius: 12px; color: white; margin: 1rem 0;">
+                            <h4 style="margin: 0; text-align: center;">📍 Address</h4>
+                            <p style="font-size: 1rem; margin: 0.8rem 0 0.3rem 0; text-align: center; font-weight: bold;">
+                                {place_info['full']}
+                            </p>
                         </div>
                         """, unsafe_allow_html=True)
+                    else:
+                        st.info("📍 Place name not available for this exact location")
                     
                     st.markdown(f"""
                     <div style="text-align: center; margin: 1.5rem 0;">
