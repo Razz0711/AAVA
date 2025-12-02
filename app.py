@@ -30,6 +30,7 @@ import os
 import json
 import base64
 import io
+import requests
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -43,6 +44,45 @@ from PIL import Image
 
 VISITOR_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "visitors.json")
 PROFILE_PIC = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets", "profile.png")
+
+# =============================================================================
+# REVERSE GEOCODING FUNCTION
+# =============================================================================
+def get_place_name(lat, lon):
+    """Get place name from coordinates using Nominatim (OpenStreetMap)."""
+    try:
+        url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lon}&zoom=18&addressdetails=1"
+        headers = {'User-Agent': 'AAVA-DIGIPIN-App/1.0'}
+        response = requests.get(url, headers=headers, timeout=5)
+        if response.status_code == 200:
+            data = response.json()
+            address = data.get('address', {})
+            display_name = data.get('display_name', '')
+            
+            # Build a clean short address
+            parts = []
+            if address.get('amenity'):
+                parts.append(address['amenity'])
+            if address.get('building'):
+                parts.append(address['building'])
+            if address.get('road'):
+                parts.append(address['road'])
+            if address.get('neighbourhood'):
+                parts.append(address['neighbourhood'])
+            if address.get('suburb'):
+                parts.append(address['suburb'])
+            if address.get('city') or address.get('town') or address.get('village'):
+                parts.append(address.get('city') or address.get('town') or address.get('village'))
+            if address.get('state'):
+                parts.append(address['state'])
+            
+            return {
+                'short': ', '.join(parts[:4]) if parts else 'Location found',
+                'full': display_name
+            }
+    except:
+        pass
+    return None
 
 DEVELOPER = {
     "name": "Raj Kumar",
@@ -742,6 +782,20 @@ with tab2:
                 
                 if result.valid:
                     st.success("✅ DIGIPIN Decoded Successfully!")
+                    
+                    # Get place name
+                    with st.spinner("🔍 Finding place name..."):
+                        place_info = get_place_name(result.center_lat, result.center_lon)
+                    
+                    # Show place name if found
+                    if place_info:
+                        st.markdown(f"""
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                                    padding: 1rem; border-radius: 10px; color: white; text-align: center; margin: 1rem 0;">
+                            <h4 style="margin: 0;">🏢 Place Name</h4>
+                            <p style="font-size: 1.1rem; margin: 0.5rem 0; font-weight: bold;">{place_info['short']}</p>
+                        </div>
+                        """, unsafe_allow_html=True)
                     
                     st.markdown(f"""
                     <div style="text-align: center; margin: 1.5rem 0;">
