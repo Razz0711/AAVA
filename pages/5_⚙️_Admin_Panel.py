@@ -15,7 +15,100 @@ import string
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from dotenv import load_dotenv
+
+# Setup path
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, PROJECT_ROOT)
+
+# Read admin config from .env file
+def get_admin_config():
+    """Read admin config directly from .env file."""
+    env_path = os.path.join(PROJECT_ROOT, '.env')
+    config = {
+        'admin_username': 'admin_raj',
+        'admin_password': 'admin_raj@'
+    }
+    
+    if os.path.exists(env_path):
+        with open(env_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith('ADMIN_USERNAME='):
+                    config['admin_username'] = line.split('=', 1)[1].strip()
+                elif line.startswith('ADMIN_PASSWORD='):
+                    config['admin_password'] = line.split('=', 1)[1].strip()
+    return config
+
+# Load config once
+ADMIN_CONFIG = get_admin_config()
+
+def get_email_config():
+    """Read email config from .env or Streamlit secrets."""
+    # Priority: Streamlit secrets > .env file
+    sender = None
+    password = None
+    # Check streamlit secrets first
+    try:
+        sender = st.secrets.get('EMAIL_SENDER') if hasattr(st, 'secrets') else None
+        password = st.secrets.get('EMAIL_PASSWORD') if hasattr(st, 'secrets') else None
+    except Exception:
+        sender = None
+        password = None
+
+    # Fallback to .env
+    if not sender or not password:
+        env_path = os.path.join(PROJECT_ROOT, '.env')
+        if os.path.exists(env_path):
+            with open(env_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith('EMAIL_SENDER=') and not sender:
+                        sender = line.split('=', 1)[1].strip()
+                    elif line.startswith('EMAIL_PASSWORD=') and not password:
+                        password = line.split('=', 1)[1].strip()
+
+    return {'sender': sender, 'password': password}
+
+
+def send_agent_credentials_email(agent_email, agent_name, agent_id, password):
+    """Send agent credentials via Gmail SMTP. Returns (success: bool, message:str)."""
+    cfg = get_email_config()
+    sender = cfg.get('sender')
+    sender_password = cfg.get('password')
+
+    if not sender or not sender_password:
+        return False, 'Email not configured. Provide EMAIL_SENDER and EMAIL_PASSWORD in secrets or .env'
+
+    try:
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = '🎉 Welcome to AAVA - Your Agent Credentials'
+        msg['From'] = sender
+        msg['To'] = agent_email
+
+        html = f"""
+        <html>
+        <body>
+        <p>Hi {agent_name},</p>
+        <p>Your agent account has been created. Here are your credentials:</p>
+        <ul>
+          <li><strong>Agent ID:</strong> {agent_id}</li>
+          <li><strong>Password:</strong> {password}</li>
+          <li><strong>Email:</strong> {agent_email}</li>
+        </ul>
+        <p>Please keep these credentials secure.</p>
+        </body>
+        </html>
+        """
+
+        msg.attach(MIMEText(html, 'html'))
+
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+            server.login(sender, sender_password)
+            server.sendmail(sender, agent_email, msg.as_string())
+
+        return True, 'Email sent successfully'
+    except Exception as e:
+        return False, str(e)
 
 def generate_strong_password(length=12):
     """Generate a strong random password."""
@@ -41,74 +134,6 @@ def generate_strong_password(length=12):
     random.shuffle(password)
     return ''.join(password)
 
-def send_agent_credentials_email(agent_email, agent_name, agent_id, password):
-    """Send agent credentials via email."""
-    try:
-        sender_email = os.getenv("EMAIL_SENDER")
-        sender_password = os.getenv("EMAIL_PASSWORD")
-        
-        if not sender_email or not sender_password:
-            return False, "Email not configured"
-        
-        # Create message
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = '🎉 Welcome to AAVA - Your Agent Credentials'
-        msg['From'] = sender_email
-        msg['To'] = agent_email
-        
-        # HTML email body
-        html = f"""
-        <html>
-        <body style="font-family: Arial, sans-serif; background-color: #f5f5f5; padding: 20px;">
-            <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <h1 style="color: #2196F3; margin: 0;">📱 AAVA Agent Portal</h1>
-                    <p style="color: #666;">Address Validation & Verification Agency</p>
-                </div>
-                
-                <h2 style="color: #333;">Welcome, {agent_name}! 🎉</h2>
-                
-                <p>You have been registered as a Field Verification Agent. Here are your login credentials:</p>
-                
-                <div style="background: #e3f2fd; border-radius: 8px; padding: 20px; margin: 20px 0;">
-                    <p style="margin: 10px 0;"><strong>🆔 Agent ID:</strong> <code style="background: #fff; padding: 5px 10px; border-radius: 4px;">{agent_id}</code></p>
-                    <p style="margin: 10px 0;"><strong>📧 Email:</strong> <code style="background: #fff; padding: 5px 10px; border-radius: 4px;">{agent_email}</code></p>
-                    <p style="margin: 10px 0;"><strong>🔑 Password:</strong> <code style="background: #fff; padding: 5px 10px; border-radius: 4px;">{password}</code></p>
-                </div>
-                
-                <p style="color: #f44336;"><strong>⚠️ Important:</strong> Please keep your credentials secure and do not share them with anyone.</p>
-                
-                <div style="text-align: center; margin-top: 30px;">
-                    <a href="https://aava-address.streamlit.app" style="background: #2196F3; color: white; padding: 12px 30px; text-decoration: none; border-radius: 6px; display: inline-block;">Login to Portal</a>
-                </div>
-                
-                <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
-                
-                <p style="color: #888; font-size: 12px; text-align: center;">
-                    This is an automated message from AAVA System.<br>
-                    © 2024 AAVA - DHRUVA Digital Address Ecosystem
-                </p>
-            </div>
-        </body>
-        </html>
-        """
-        
-        msg.attach(MIMEText(html, 'html'))
-        
-        # Send email via Gmail SMTP
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
-            server.login(sender_email, sender_password)
-            server.sendmail(sender_email, agent_email, msg.as_string())
-        
-        return True, "Email sent successfully"
-    except Exception as e:
-        return False, str(e)
-
-# Load environment variables
-load_dotenv()
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from utils.database import get_database
 from utils.digipin import DIGIPINValidator
 from utils.confidence_score import SampleDataGenerator, get_grade
@@ -119,9 +144,9 @@ st.set_page_config(
     layout="wide"
 )
 
-# Admin credentials from environment variables (with fallback)
-ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin_raj")
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin_raj@")
+# Admin credentials from config
+ADMIN_USERNAME = ADMIN_CONFIG['admin_username']
+ADMIN_PASSWORD = ADMIN_CONFIG['admin_password']
 
 # Initialize session state for admin login
 if 'admin_logged_in' not in st.session_state:
@@ -606,6 +631,7 @@ with tab3:
             name = st.text_input("Name *")
             email = st.text_input("Email *")
             phone = st.text_input("Phone")
+            send_credentials = st.checkbox("Send credentials via email to the agent", value=False, help="If checked, the agent will receive their Agent ID and password by email (requires EMAIL_SENDER and EMAIL_PASSWORD configured)")
             
             col_a, col_b = st.columns(2)
             with col_a:
@@ -635,13 +661,16 @@ with tab3:
                         st.success(f"✅ Agent created!")
                         st.info(f"🆔 Agent ID: `{agent_id}`")
                         st.info(f"🔑 Password: `{auto_password}`")
-                        
-                        # Send credentials via email
-                        email_sent, email_msg = send_agent_credentials_email(email, name, agent_id, auto_password)
-                        if email_sent:
-                            st.success(f"📧 Credentials sent to {email}")
+
+                        # Optionally send credentials via email
+                        if send_credentials:
+                            email_sent, email_msg = send_agent_credentials_email(email, name, agent_id, auto_password)
+                            if email_sent:
+                                st.success(f"📧 Credentials sent to {email}")
+                            else:
+                                st.warning(f"📧 Email not sent: {email_msg}")
+                                st.warning("⚠️ Please save this password - it won't be shown again!")
                         else:
-                            st.warning(f"📧 Email not sent: {email_msg}")
                             st.warning("⚠️ Please save this password - it won't be shown again!")
                     except Exception as e:
                         st.error(f"Error: {str(e)}")
