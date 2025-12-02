@@ -217,6 +217,56 @@ st.set_page_config(
     layout="wide"
 )
 
+# =============================================================================
+# ACCESS CHECK - Agent OR Admin required (protects API credits)
+# =============================================================================
+
+# Initialize session states for login check
+if 'logged_in_agent' not in st.session_state:
+    st.session_state.logged_in_agent = None
+if 'admin_logged_in' not in st.session_state:
+    st.session_state.admin_logged_in = False
+
+is_agent_logged_in = st.session_state.logged_in_agent is not None
+is_admin_logged_in = st.session_state.admin_logged_in
+
+if not is_agent_logged_in and not is_admin_logged_in:
+    # Show login required message
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #9C27B0 0%, #673AB7 100%); 
+                padding: 1.5rem 2rem; border-radius: 12px; color: white; margin-bottom: 2rem;">
+        <h1 style="margin: 0;">🤖 AI Chat Assistant</h1>
+        <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Login Required</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.warning("🔐 **Login Required**")
+    st.info("This page is accessible to **Agents** and **Admins** only to protect API resources.")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("🔑 Agent Login", use_container_width=True, type="primary"):
+            st.switch_page("pages/3_📱_Agent_Portal.py")
+    with col2:
+        if st.button("⚙️ Admin Login", use_container_width=True):
+            st.switch_page("pages/5_⚙️_Admin_Panel.py")
+    
+    st.markdown("---")
+    st.markdown("### 🔍 Looking for Public Services?")
+    st.markdown("Visit our **Public DIGIPIN Verification** page for free access to:")
+    st.markdown("- ✅ Verify DIGIPIN codes")
+    st.markdown("- 📍 Convert coordinates to DIGIPIN")
+    st.markdown("- 🗺️ Lookup DIGIPIN locations")
+    
+    if st.button("🔍 Go to Public Verify Page", use_container_width=True):
+        st.switch_page("pages/7_🔍_Public_Verify.py")
+    
+    st.stop()
+
+# Determine user type for display
+user_type = "Admin" if is_admin_logged_in else "Agent"
+user_name = "Administrator" if is_admin_logged_in else st.session_state.logged_in_agent.get('name', 'Agent')
+
 # Initialize
 db = get_database()
 validator = DIGIPINValidator()
