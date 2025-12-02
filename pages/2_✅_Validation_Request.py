@@ -1,6 +1,6 @@
 # pages/2_✅_Validation_Request.py
 # AAVA - Validation Request Page
-# Submit new address validation requests
+# Submit new address validation requests (Agent Login Required)
 
 import streamlit as st
 import sys
@@ -23,6 +23,10 @@ st.set_page_config(
 # Initialize
 db = get_database()
 validator = DIGIPINValidator()
+
+# Initialize session state for agent login
+if 'logged_in_agent' not in st.session_state:
+    st.session_state.logged_in_agent = None
 
 # Custom CSS
 st.markdown("""
@@ -56,12 +60,42 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Header
-st.markdown("""
+# =============================================================================
+# AGENT LOGIN CHECK
+# =============================================================================
+
+if st.session_state.logged_in_agent is None:
+    # Show login required message
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); 
+                padding: 1.5rem 2rem; border-radius: 12px; color: white; margin-bottom: 2rem;">
+        <h1 style="margin: 0;">✅ Validation Request</h1>
+        <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Agent Login Required</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.warning("🔐 **Agent Login Required**")
+    st.info("Please login through the **Agent Portal** to access this page.")
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button("🔑 Go to Agent Portal", use_container_width=True, type="primary"):
+            st.switch_page("pages/3_📱_Agent_Portal.py")
+    
+    st.stop()
+
+# =============================================================================
+# LOGGED IN - SHOW MAIN CONTENT
+# =============================================================================
+
+agent = st.session_state.logged_in_agent
+
+# Header with agent info
+st.markdown(f"""
 <div style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); 
             padding: 1.5rem 2rem; border-radius: 12px; color: white; margin-bottom: 2rem;">
     <h1 style="margin: 0;">✅ Validation Request</h1>
-    <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Submit a new address validation request</p>
+    <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Welcome, {agent.get('name', 'Agent')} | Submit new address validation requests</p>
 </div>
 """, unsafe_allow_html=True)
 

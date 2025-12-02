@@ -44,28 +44,34 @@ ADMIN_CONFIG = get_admin_config()
 
 def get_email_config():
     """Read email config from .env or Streamlit secrets."""
-    # Priority: Streamlit secrets > .env file
     sender = None
     password = None
+    
     # Check streamlit secrets first
     try:
-        sender = st.secrets.get('EMAIL_SENDER') if hasattr(st, 'secrets') else None
-        password = st.secrets.get('EMAIL_PASSWORD') if hasattr(st, 'secrets') else None
+        if hasattr(st, 'secrets'):
+            sender = st.secrets.get('EMAIL_SENDER', None)
+            password = st.secrets.get('EMAIL_PASSWORD', None)
     except Exception:
-        sender = None
-        password = None
+        pass
 
-    # Fallback to .env
+    # Fallback to .env file
     if not sender or not password:
         env_path = os.path.join(PROJECT_ROOT, '.env')
         if os.path.exists(env_path):
             with open(env_path, 'r', encoding='utf-8') as f:
                 for line in f:
                     line = line.strip()
-                    if line.startswith('EMAIL_SENDER=') and not sender:
-                        sender = line.split('=', 1)[1].strip()
-                    elif line.startswith('EMAIL_PASSWORD=') and not password:
-                        password = line.split('=', 1)[1].strip()
+                    if not line or line.startswith('#'):
+                        continue
+                    if '=' in line:
+                        key, value = line.split('=', 1)
+                        key = key.strip()
+                        value = value.strip()
+                        if key == 'EMAIL_SENDER' and not sender:
+                            sender = value
+                        elif key == 'EMAIL_PASSWORD' and not password:
+                            password = value
 
     return {'sender': sender, 'password': password}
 
