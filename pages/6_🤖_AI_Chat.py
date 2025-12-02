@@ -1122,26 +1122,11 @@ for msg in st.session_state.chat_messages:
 # Welcome message if empty
 if not st.session_state.chat_messages:
     with st.chat_message("assistant", avatar=ASSISTANT_AVATAR if os.path.exists(ASSISTANT_AVATAR) else None):
-        st.markdown("""👋 **Welcome to AAVA AI Assistant!**
+        st.markdown("""👋 **Hello! I'm AAVA AI Assistant**
 
-I'm your comprehensive AI helper! I can assist with:
+Ask me anything - I'm here to help! 💬
 
-🎓 **Academics & Education:**
-- Any subject: Math, Science, History, English, etc.
-- Syllabus questions (CBSE, ICSE, State Boards)
-- Competitive exams (JEE, NEET, UPSC, etc.)
-- Homework help with detailed explanations
-
-💻 **Technology & Coding:**
-- Programming in any language
-- Project help and debugging
-
-🏢 **AAVA & DIGIPIN (Special Expertise):**
-- DIGIPIN encode/decode operations
-- Confidence scores & validation workflows
-- Complete DHRUVA ecosystem knowledge
-
-**Try asking:** "Explain photosynthesis in detail" or "Solve x² + 5x + 6 = 0" or "What is DIGIPIN?"
+✨ *Try: "What is DIGIPIN?" or any question you have!*
 """)
 
 # Always show chat input
