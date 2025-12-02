@@ -251,16 +251,6 @@ if not is_agent_logged_in and not is_admin_logged_in:
         if st.button("⚙️ Admin Login", use_container_width=True):
             st.switch_page("pages/5_⚙️_Admin_Panel.py")
     
-    st.markdown("---")
-    st.markdown("### 🔍 Looking for Public Services?")
-    st.markdown("Visit our **Public DIGIPIN Verification** page for free access to:")
-    st.markdown("- ✅ Verify DIGIPIN codes")
-    st.markdown("- 📍 Convert coordinates to DIGIPIN")
-    st.markdown("- 🗺️ Lookup DIGIPIN locations")
-    
-    if st.button("🔍 Go to Public Verify Page", use_container_width=True):
-        st.switch_page("pages/7_🔍_Public_Verify.py")
-    
     st.stop()
 
 # Determine user type for display
