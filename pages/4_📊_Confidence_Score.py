@@ -43,41 +43,7 @@ if 'logged_in_agent' not in st.session_state:
 if 'admin_logged_in' not in st.session_state:
     st.session_state.admin_logged_in = False
 
-# =============================================================================
-# ACCESS CHECK - Agent OR Admin required
-# =============================================================================
-
-is_agent_logged_in = st.session_state.logged_in_agent is not None
-is_admin_logged_in = st.session_state.admin_logged_in
-
-if not is_agent_logged_in and not is_admin_logged_in:
-    # Show login required message
-    st.markdown("""
-    <div style="background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%); 
-                padding: 1.5rem 2rem; border-radius: 12px; color: white; margin-bottom: 2rem;">
-        <h1 style="margin: 0;">📊 Confidence Score</h1>
-        <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Login Required</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    st.warning("🔐 **Login Required**")
-    st.info("This page is accessible to **Agents** and **Admins** only.")
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("🔑 Agent Login", use_container_width=True, type="primary"):
-            st.switch_page("pages/3_📱_Agent_Portal.py")
-    with col2:
-        if st.button("⚙️ Admin Login", use_container_width=True):
-            st.switch_page("pages/5_⚙️_Admin_Panel.py")
-    
-    st.stop()
-
-# Determine user type for display
-user_type = "Admin" if is_admin_logged_in else "Agent"
-user_name = "Administrator" if is_admin_logged_in else st.session_state.logged_in_agent.get('name', 'Agent')
-
-# Custom CSS
+# Custom CSS - Apply BEFORE access check so sidebar looks consistent
 st.markdown("""
 <style>
     /* Sidebar Navigation */
@@ -127,6 +93,40 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
+
+# =============================================================================
+# ACCESS CHECK - Agent OR Admin required
+# =============================================================================
+
+is_agent_logged_in = st.session_state.logged_in_agent is not None
+is_admin_logged_in = st.session_state.admin_logged_in
+
+if not is_agent_logged_in and not is_admin_logged_in:
+    # Show login required message
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%); 
+                padding: 1.5rem 2rem; border-radius: 12px; color: white; margin-bottom: 2rem;">
+        <h1 style="margin: 0;">📊 Confidence Score</h1>
+        <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Login Required</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.warning("🔐 **Login Required**")
+    st.info("This page is accessible to **Agents** and **Admins** only.")
+    
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("🔑 Agent Login", use_container_width=True, type="primary"):
+            st.switch_page("pages/3_📱_Agent_Portal.py")
+    with col2:
+        if st.button("⚙️ Admin Login", use_container_width=True):
+            st.switch_page("pages/5_⚙️_Admin_Panel.py")
+    
+    st.stop()
+
+# Determine user type for display
+user_type = "Admin" if is_admin_logged_in else "Agent"
+user_name = "Administrator" if is_admin_logged_in else st.session_state.logged_in_agent.get('name', 'Agent')
 
 # Header with logged-in user info
 st.markdown(f"""
