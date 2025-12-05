@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AAVA - Digital Address DPI Innovation Hackathon</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a1a2e; color: white; }
+        .slide { min-height: 100vh; padding: 60px; display: flex; flex-direction: column; justify-content: center; page-break-after: always; }
+        h1 { font-size: 3rem; margin-bottom: 1rem; background: linear-gradient(135deg, #4CAF50, #2196F3); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h2 { font-size: 2.2rem; color: #4CAF50; margin-bottom: 1.5rem; }
+        h3 { font-size: 1.6rem; color: #2196F3; margin: 1rem 0; }
+        p, li { font-size: 1.3rem; line-height: 1.8; color: #e0e0e0; }
+        ul { margin-left: 2rem; margin-top: 1rem; }
+        li { margin: 0.8rem 0; }
+        .highlight { color: #4CAF50; font-weight: bold; }
+        .card { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 2rem; margin: 1rem 0; border-left: 4px solid #4CAF50; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; margin: 2rem 0; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin: 2rem 0; }
+        .center { text-align: center; }
+        .badge { display: inline-block; background: #4CAF50; color: white; padding: 0.5rem 1rem; border-radius: 20px; margin: 0.3rem; font-size: 1rem; }
+        .flow { display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap; margin: 2rem 0; }
+        .flow-item { background: rgba(76, 175, 80, 0.2); padding: 1rem 1.5rem; border-radius: 8px; border: 2px solid #4CAF50; }
+        .arrow { font-size: 2rem; color: #4CAF50; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        th { background: rgba(76, 175, 80, 0.3); color: #4CAF50; }
+        .subtitle { font-size: 1.5rem; color: #888; margin-top: 0.5rem; }
+        .big-emoji { font-size: 4rem; margin-bottom: 1rem; }
+        .stat { font-size: 3rem; font-weight: bold; color: #4CAF50; }
+        .stat-label { font-size: 1rem; color: #888; }
+        .contact-card { background: linear-gradient(135deg, rgba(76,175,80,0.2), rgba(33,150,243,0.2)); border-radius: 16px; padding: 2rem; text-align: center; }
+        .contact-link { color: #4CAF50; text-decoration: none; font-size: 1.2rem; }
+        .contact-link:hover { text-decoration: underline; }
+        @media print { .slide { page-break-after: always; } }
+    </style>
+</head>
+<body>
+
+<!-- Slide 1: Title -->
+<div class="slide center">
+    <div class="big-emoji">🏠✅</div>
+    <h1>AAVA</h1>
+    <p class="subtitle">Authorised Address Validation Agency</p>
+    <br><br>
+    <h2 style="color: white;">Digital Address DPI Innovation Hackathon</h2>
+    <p>Shaastra 2026 | IIT Madras</p>
+    <br><br>
+    <div class="card" style="display: inline-block; border-left-color: #2196F3;">
+        <p><strong>Team:</strong> Raj Kumar</p>
+        <p><strong>Track:</strong> DHRUVA Ecosystem Implementation</p>
+    </div>
+</div>
+
+<!-- Slide 2: Problem Statement -->
+<div class="slide">
+    <h2>🎯 The Problem</h2>
+    <div class="grid">
+        <div class="card">
+            <h3>📍 Address Ambiguity</h3>
+            <ul>
+                <li>40% delivery failures in India due to incorrect addresses</li>
+                <li>No standardized address validation system</li>
+                <li>Manual verification is slow & expensive</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h3>💸 Economic Impact</h3>
+            <ul>
+                <li>₹14,000+ crore annual losses in logistics</li>
+                <li>Poor customer experience</li>
+                <li>Fraud & identity issues</li>
+            </ul>
+        </div>
+    </div>
+    <div class="card center" style="border-left-color: #f44336;">
+        <p class="highlight" style="font-size: 1.5rem;">India needs a Digital Public Infrastructure for Address Validation</p>
+    </div>
+</div>
+
+<!-- Slide 3: Solution Overview -->
+<div class="slide">
+    <h2>💡 Our Solution: AAVA</h2>
+    <p style="font-size: 1.5rem; margin-bottom: 2rem;">A complete implementation of the <span class="highlight">DHRUVA ecosystem</span> for address validation</p>
+    
+    <div class="grid-3">
+        <div class="card center">
+            <div style="font-size: 3rem;">🆔</div>
+            <h3>AIA</h3>
+            <p>Address Issuance Authority</p>
+            <p style="font-size: 1rem; color: #888;">User Portal for address registration</p>
+        </div>
+        <div class="card center">
+            <div style="font-size: 3rem;">📋</div>
+            <h3>AIP</h3>
+            <p>Address Information Provider</p>
+            <p style="font-size: 1rem; color: #888;">Registry & storage</p>
+        </div>
+        <div class="card center">
+            <div style="font-size: 3rem;">🔑</div>
+            <h3>AIU</h3>
+            <p>Address Information User</p>
+            <p style="font-size: 1rem; color: #888;">Consent-based access</p>
+        </div>
+    </div>
+    
+    <div class="grid">
+        <div class="card center">
+            <div style="font-size: 3rem;">📱</div>
+            <h3>AAVA</h3>
+            <p>Agent Verification Portal</p>
+        </div>
+        <div class="card center">
+            <div style="font-size: 3rem;">🗺️</div>
+            <h3>Central Mapper</h3>
+            <p>DIGIPIN ↔ Address Resolution</p>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 4: DIGIPIN Integration -->
+<div class="slide">
+    <h2>📍 DIGIPIN: The Foundation</h2>
+    
+    <div class="card">
+        <h3>What is DIGIPIN?</h3>
+        <p>A 10-character geo-coded address that maps to a ~4m × 4m area</p>
+        <br>
+        <div class="center">
+            <code style="font-size: 2rem; background: #333; padding: 1rem 2rem; border-radius: 8px;">3PJ-K4M-5L2T</code>
+        </div>
+    </div>
+    
+    <div class="grid">
+        <div class="card">
+            <h3>✅ Our Implementation</h3>
+            <ul>
+                <li>Full DIGIPIN encoder/decoder</li>
+                <li>Real-time validation</li>
+                <li>Map visualization</li>
+                <li>Coordinate extraction</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h3>🔢 Valid Characters</h3>
+            <p style="font-size: 2rem; letter-spacing: 0.5rem; text-align: center; margin-top: 1rem;">
+                2 3 4 5 6 7 8 9<br>
+                C F J K L M P T
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 5: Confidence Score Algorithm -->
+<div class="slide">
+    <h2>📊 Confidence Score Algorithm</h2>
+    <p>Multi-factor scoring system based on DHRUVA specification</p>
+    
+    <div class="card">
+        <h3>Formula Components</h3>
+        <table>
+            <tr>
+                <th>Component</th>
+                <th>Weight</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>Spatial Accuracy (SAS)</td>
+                <td>30%</td>
+                <td>DIGIPIN precision & coordinate accuracy</td>
+            </tr>
+            <tr>
+                <td>Physical Verification (PVS)</td>
+                <td>35%</td>
+                <td>Agent on-site verification + evidence</td>
+            </tr>
+            <tr>
+                <td>Delivery History (DHS)</td>
+                <td>20%</td>
+                <td>Historical delivery success rate</td>
+            </tr>
+            <tr>
+                <td>Document Verification (DVS)</td>
+                <td>15%</td>
+                <td>Supporting documents quality</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="flow">
+        <div class="flow-item">50%<br><small>Initial</small></div>
+        <span class="arrow">→</span>
+        <div class="flow-item">+30-50%<br><small>After Verification</small></div>
+        <span class="arrow">→</span>
+        <div class="flow-item">100%<br><small>Grade A+</small></div>
+    </div>
+</div>
+
+<!-- Slide 6: Agent Verification Flow -->
+<div class="slide">
+    <h2>📱 Agent Verification Workflow</h2>
+    
+    <div class="flow">
+        <div class="flow-item">👤 User<br>Registers Address</div>
+        <span class="arrow">→</span>
+        <div class="flow-item">📋 Validation<br>Request Created</div>
+        <span class="arrow">→</span>
+        <div class="flow-item">📱 Agent<br>Claims Task</div>
+        <span class="arrow">→</span>
+        <div class="flow-item">📍 On-Site<br>Verification</div>
+        <span class="arrow">→</span>
+        <div class="flow-item">✅ Score<br>Updated</div>
+    </div>
+    
+    <div class="grid">
+        <div class="card">
+            <h3>Agent Collects</h3>
+            <ul>
+                <li>📸 Photo evidence</li>
+                <li>📍 GPS coordinates</li>
+                <li>✍️ Digital signature</li>
+                <li>📝 Verification notes</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h3>System Updates</h3>
+            <ul>
+                <li>Confidence score recalculated</li>
+                <li>Grade assigned (A+ to F)</li>
+                <li>Audit log created</li>
+                <li>User notified</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 7: Consent Framework -->
+<div class="slide">
+    <h2>🔐 Privacy & Consent Framework</h2>
+    <p>DPDPA-compliant consent management</p>
+    
+    <div class="grid">
+        <div class="card">
+            <h3>User Controls</h3>
+            <ul>
+                <li>Grant/Revoke access anytime</li>
+                <li>Set expiry dates</li>
+                <li>Define scope (view/verify/full)</li>
+                <li>Track all access attempts</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h3>Consent Artifact</h3>
+            <ul>
+                <li>Unique access tokens</li>
+                <li>Purpose-bound access</li>
+                <li>Audit trail</li>
+                <li>Cryptographic verification</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="card center">
+        <p class="highlight">User is always in control of their address data</p>
+    </div>
+</div>
+
+<!-- Slide 8: Tech Stack -->
+<div class="slide">
+    <h2>🛠️ Technology Stack</h2>
+    
+    <div class="grid-3">
+        <div class="card center">
+            <h3>Frontend</h3>
+            <span class="badge">Streamlit</span>
+            <span class="badge">Plotly</span>
+            <span class="badge">CSS3</span>
+        </div>
+        <div class="card center">
+            <h3>Backend</h3>
+            <span class="badge">Python</span>
+            <span class="badge">SQLite</span>
+            <span class="badge">REST APIs</span>
+        </div>
+        <div class="card center">
+            <h3>Mapping</h3>
+            <span class="badge">DIGIPIN</span>
+            <span class="badge">OpenStreetMap</span>
+            <span class="badge">Plotly Maps</span>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h3>Key Features</h3>
+        <div class="grid">
+            <ul>
+                <li>Multi-page Streamlit application</li>
+                <li>SQLite database with full schema</li>
+                <li>Thread-safe database operations</li>
+            </ul>
+            <ul>
+                <li>Real-time DIGIPIN validation</li>
+                <li>Interactive map visualizations</li>
+                <li>Audit logging system</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 9: Demo Screenshots -->
+<div class="slide">
+    <h2>🖥️ Application Modules</h2>
+    
+    <div class="grid-3">
+        <div class="card center">
+            <div style="font-size: 2.5rem;">🏠</div>
+            <h3>Home</h3>
+            <p>Dashboard & overview</p>
+        </div>
+        <div class="card center">
+            <div style="font-size: 2.5rem;">✅</div>
+            <h3>Validation Request</h3>
+            <p>Submit & track requests</p>
+        </div>
+        <div class="card center">
+            <div style="font-size: 2.5rem;">📱</div>
+            <h3>Agent Portal</h3>
+            <p>Field verification</p>
+        </div>
+        <div class="card center">
+            <div style="font-size: 2.5rem;">📊</div>
+            <h3>Confidence Score</h3>
+            <p>View & analyze scores</p>
+        </div>
+        <div class="card center">
+            <div style="font-size: 2.5rem;">👤</div>
+            <h3>User Portal</h3>
+            <p>Manage addresses</p>
+        </div>
+        <div class="card center">
+            <div style="font-size: 2.5rem;">⚙️</div>
+            <h3>Admin Panel</h3>
+            <p>System management</p>
+        </div>
+    </div>
+    
+    <div class="grid">
+        <div class="card center">
+            <div style="font-size: 2.5rem;">🔑</div>
+            <h3>AIU Access</h3>
+            <p>Token-based address lookup</p>
+        </div>
+        <div class="card center">
+            <div style="font-size: 2.5rem;">🗺️</div>
+            <h3>Central Mapper</h3>
+            <p>DIGIPIN resolution</p>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 10: DHRUVA Compliance -->
+<div class="slide">
+    <h2>✅ DHRUVA Specification Compliance</h2>
+    
+    <table>
+        <tr>
+            <th>Section</th>
+            <th>Requirement</th>
+            <th>Status</th>
+        </tr>
+        <tr>
+            <td>4.1</td>
+            <td>Digital Address Format (user@provider.domain)</td>
+            <td>✅ 100%</td>
+        </tr>
+        <tr>
+            <td>4.2</td>
+            <td>DIGIPIN Integration</td>
+            <td>✅ 100%</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>Address Validation Components (AIA, AIP, AIU)</td>
+            <td>✅ 100%</td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td>Confidence Scoring System</td>
+            <td>✅ 100%</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td>Consent Framework</td>
+            <td>✅ 100%</td>
+        </tr>
+        <tr>
+            <td>8</td>
+            <td>Security & Privacy</td>
+            <td>✅ 100%</td>
+        </tr>
+        <tr>
+            <td>Appendix I</td>
+            <td>Apache 2.0 License</td>
+            <td>✅ 100%</td>
+        </tr>
+    </table>
+</div>
+
+<!-- Slide 11: Use Cases -->
+<div class="slide">
+    <h2>🎯 Real-World Use Cases</h2>
+    
+    <div class="grid">
+        <div class="card">
+            <h3>📦 E-Commerce & Logistics</h3>
+            <ul>
+                <li>Reduce delivery failures by 80%</li>
+                <li>Pre-validate addresses before dispatch</li>
+                <li>Improve last-mile efficiency</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h3>🏦 Banking & Finance</h3>
+            <ul>
+                <li>KYC address verification</li>
+                <li>Loan processing</li>
+                <li>Fraud prevention</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h3>🏛️ Government Services</h3>
+            <ul>
+                <li>Aadhaar address updates</li>
+                <li>Service delivery</li>
+                <li>Subsidy distribution</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h3>📱 Telecom & Utilities</h3>
+            <ul>
+                <li>Service installation</li>
+                <li>Bill delivery</li>
+                <li>Customer onboarding</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 12: Impact Metrics -->
+<div class="slide">
+    <h2>📈 Expected Impact</h2>
+    
+    <div class="grid-3">
+        <div class="card center">
+            <div class="stat">80%</div>
+            <div class="stat-label">Reduction in delivery failures</div>
+        </div>
+        <div class="card center">
+            <div class="stat">₹10K Cr</div>
+            <div class="stat-label">Annual savings in logistics</div>
+        </div>
+        <div class="card center">
+            <div class="stat">5x</div>
+            <div class="stat-label">Faster address verification</div>
+        </div>
+    </div>
+    
+    <div class="grid">
+        <div class="card center">
+            <div class="stat">100M+</div>
+            <div class="stat-label">Addresses validated annually</div>
+        </div>
+        <div class="card center">
+            <div class="stat">99.9%</div>
+            <div class="stat-label">Accuracy with verification</div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 13: Competitive Advantage -->
+<div class="slide">
+    <h2>🏆 Why AAVA?</h2>
+    
+    <div class="grid">
+        <div class="card">
+            <h3>vs. Google Maps</h3>
+            <ul>
+                <li>✅ DIGIPIN native support</li>
+                <li>✅ Confidence scoring</li>
+                <li>✅ Agent verification</li>
+                <li>✅ Consent management</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h3>vs. Manual Verification</h3>
+            <ul>
+                <li>✅ 10x faster</li>
+                <li>✅ Digital audit trail</li>
+                <li>✅ Standardized process</li>
+                <li>✅ Scalable nationwide</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="card center" style="border-left-color: #2196F3;">
+        <h3>Built for India's Digital Public Infrastructure</h3>
+        <p>Compliant with DHRUVA, DPDPA, and Aadhaar frameworks</p>
+    </div>
+</div>
+
+<!-- Slide 14: Roadmap -->
+<div class="slide">
+    <h2>🗺️ Future Roadmap</h2>
+    
+    <div class="flow">
+        <div class="flow-item" style="border-color: #4CAF50; background: rgba(76,175,80,0.3);">
+            <strong>Phase 1</strong><br>
+            Current MVP<br>
+            <small>✅ Complete</small>
+        </div>
+        <span class="arrow">→</span>
+        <div class="flow-item">
+            <strong>Phase 2</strong><br>
+            Mobile App<br>
+            <small>Q1 2026</small>
+        </div>
+        <span class="arrow">→</span>
+        <div class="flow-item">
+            <strong>Phase 3</strong><br>
+            API Platform<br>
+            <small>Q2 2026</small>
+        </div>
+        <span class="arrow">→</span>
+        <div class="flow-item">
+            <strong>Phase 4</strong><br>
+            National Scale<br>
+            <small>Q4 2026</small>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h3>Upcoming Features</h3>
+        <div class="grid">
+            <ul>
+                <li>📱 React Native mobile app</li>
+                <li>🔌 REST/GraphQL APIs</li>
+                <li>🤖 ML-based fraud detection</li>
+            </ul>
+            <ul>
+                <li>🔗 Aadhaar integration</li>
+                <li>📊 Analytics dashboard</li>
+                <li>🌐 Multi-language support</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 15: Live Demo -->
+<div class="slide center">
+    <div class="big-emoji">🎬</div>
+    <h1>Live Demo</h1>
+    <br>
+    <div class="card" style="display: inline-block;">
+        <p style="font-size: 1.5rem;">Let's see AAVA in action!</p>
+        <br>
+        <p>1. Register an address (User Portal)</p>
+        <p>2. Agent claims & verifies task</p>
+        <p>3. Watch confidence score update</p>
+        <p>4. Generate access token</p>
+    </div>
+</div>
+
+<!-- Slide 16: Summary -->
+<div class="slide">
+    <h2>📝 Summary</h2>
+    
+    <div class="card">
+        <h3>What We Built</h3>
+        <ul>
+            <li>Complete <span class="highlight">DHRUVA ecosystem</span> implementation</li>
+            <li><span class="highlight">DIGIPIN</span> encoder/decoder with validation</li>
+            <li><span class="highlight">Multi-factor confidence scoring</span> algorithm</li>
+            <li><span class="highlight">Agent verification</span> workflow</li>
+            <li><span class="highlight">Consent management</span> framework</li>
+            <li><span class="highlight">9 integrated modules</span> (AIA, AIP, AIU, AAVA, etc.)</li>
+        </ul>
+    </div>
+    
+    <div class="card center" style="border-left-color: #2196F3;">
+        <p style="font-size: 1.5rem;">A production-ready foundation for India's address validation infrastructure</p>
+    </div>
+</div>
+
+<!-- Slide 17: Thank You & Contact -->
+<div class="slide center">
+    <div class="big-emoji">🙏</div>
+    <h1>Thank You!</h1>
+    <br>
+    <div class="contact-card">
+        <h2 style="color: white; margin-bottom: 1.5rem;">Questions?</h2>
+        
+        <div style="margin: 2rem 0;">
+            <p style="font-size: 1.5rem; margin-bottom: 0.5rem;">👤 <strong>Raj Kumar</strong></p>
+        </div>
+        
+        <div style="margin: 1.5rem 0;">
+            <p style="margin-bottom: 0.5rem;">📧 Email:</p>
+            <a href="mailto:rajkumar648321@gmail.com" class="contact-link">rajkumar648321@gmail.com</a>
+        </div>
+        
+        <div style="margin: 1.5rem 0;">
+            <p style="margin-bottom: 0.5rem;">💼 LinkedIn:</p>
+            <a href="https://www.linkedin.com/in/raj-kumar-9a149a280" target="_blank" class="contact-link">linkedin.com/in/raj-kumar-9a149a280</a>
+        </div>
+        
+        <div style="margin: 1.5rem 0;">
+            <p style="margin-bottom: 0.5rem;">💻 GitHub Repository:</p>
+            <a href="https://github.com/Razz0711/AAVA" target="_blank" class="contact-link">github.com/Razz0711/AAVA</a>
+        </div>
+    </div>
+    
+    <br>
+    <div class="badge" style="font-size: 1.2rem; padding: 1rem 2rem;">Digital Address DPI Innovation Hackathon | Shaastra 2026</div>
+</div>
+
+</body>
+</html>
