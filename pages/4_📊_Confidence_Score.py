@@ -17,7 +17,6 @@ from utils.database import get_database
 from utils.digipin import DIGIPINValidator
 from utils.confidence_score import (
     ConfidenceScoreCalculator,
-    SampleDataGenerator,
     AddressData,
     DeliveryRecord,
     PhysicalVerification,
@@ -197,7 +196,7 @@ with tab1:
                     search_type = "DIGIPIN"
                     search_btn = True
         else:
-            st.info("No addresses in database. Generate sample data from Admin Panel.")
+            st.info("No addresses in database. Create addresses via Validation Request or User Portal.")
     
     st.divider()
     
@@ -362,7 +361,7 @@ with tab1:
         
         else:
             st.error("❌ Address not found. Please check the search value.")
-            st.info("💡 Try searching with a different identifier or generate sample data from Admin Panel.")
+            st.info("💡 Try searching with a different identifier.")
 
 
 # =============================================================================
@@ -666,10 +665,7 @@ with tab3:
         )
     
     else:
-        st.info("📊 Need at least 5 addresses for batch analysis. Generate sample data from Admin Panel!")
-        
-        if st.button("🎲 Generate Sample Data"):
-            st.info("Please go to Admin Panel → Sample Data Generation")
+        st.info("📊 Need at least 5 addresses for batch analysis. Create addresses via Validation Request or User Portal.")
 
 # Footer
 st.markdown("""

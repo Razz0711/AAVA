@@ -572,7 +572,7 @@ with tab1:
                     legend=dict(orientation="h", yanchor="bottom", y=-0.2)
                 )
                 st.plotly_chart(fig, use_container_width=True)
-                st.caption("📊 Demo data - Add validations to see real statistics")
+                st.caption("📊 Example data - Add validations to see real statistics")
         except:
             st.info("No validation data available yet.")
     
@@ -616,7 +616,7 @@ with tab1:
             showlegend=False
         )
         st.plotly_chart(fig, use_container_width=True)
-        st.caption("📊 Sample distribution - Real data will appear as addresses are scored")
+        st.caption("📊 Example distribution - Real data will appear as addresses are scored")
     
     st.divider()
     
@@ -693,7 +693,7 @@ with tab1:
 with tab2:
     st.markdown("### 📈 Confidence Score Calculator")
     st.markdown("""
-    Test the confidence score algorithm with sample data or custom parameters.
+    Test the confidence score algorithm with custom parameters.
     The score (0-100) is calculated based on 4 components.
     """)
     
@@ -747,14 +747,14 @@ with tab2:
             st.success("✅ Weights are valid")
     
     with col2:
-        st.markdown("#### 🎲 Sample Data Parameters")
+        st.markdown("#### 🎲 Test Parameters")
         
         num_deliveries = st.slider(
             "Number of deliveries",
             min_value=1,
             max_value=50,
             value=15,
-            key="sample_deliveries"
+            key="test_deliveries"
         )
         
         success_rate = st.slider(
@@ -763,7 +763,7 @@ with tab2:
             max_value=1.0,
             value=0.80,
             step=0.05,
-            key="sample_success"
+            key="test_success"
         )
         
         num_verifications = st.slider(
@@ -771,7 +771,7 @@ with tab2:
             min_value=0,
             max_value=5,
             value=1,
-            key="sample_verifications"
+            key="test_verifications"
         )
         
         days_old = st.slider(
@@ -779,11 +779,11 @@ with tab2:
             min_value=1,
             max_value=365,
             value=60,
-            key="sample_days"
+            key="test_days"
         )
     
-    if st.button("🔄 Calculate Sample Score", type="primary", key="calc_score_btn"):
-        # Generate sample address
+    if st.button("🔄 Calculate Test Score", type="primary", key="calc_score_btn"):
+        # Generate test address
         address = SampleDataGenerator.generate_address(
             num_deliveries=num_deliveries,
             num_verifications=num_verifications,

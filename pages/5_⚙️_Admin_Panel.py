@@ -142,7 +142,7 @@ def generate_strong_password(length=12):
 
 from utils.database import get_database
 from utils.digipin import DIGIPINValidator
-from utils.confidence_score import SampleDataGenerator, get_grade
+from utils.confidence_score import get_grade
 
 st.set_page_config(
     page_title="Admin Panel - AAVA",
@@ -288,11 +288,10 @@ with col_logout:
         st.rerun()
 
 # Tabs
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab1, tab2, tab3, tab4 = st.tabs([
     "📊 Dashboard",
     "📋 Validations",
     "👥 Agents",
-    "🎲 Sample Data",
     "📝 Audit Logs"
 ])
 
@@ -515,7 +514,7 @@ with tab2:
                 else:
                     st.warning("Select validations first")
     else:
-        st.info("📋 No validations found. Generate sample data or create new validations.")
+        st.info("📋 No validations found. Create new validations via the Validation Request page.")
 
 
 # =============================================================================
@@ -708,266 +707,10 @@ with tab3:
 
 
 # =============================================================================
-# TAB 4: SAMPLE DATA GENERATION
+# TAB 4: AUDIT LOGS
 # =============================================================================
 
 with tab4:
-    st.markdown("### 🎲 Sample Data Generation")
-    
-    st.markdown("""
-    Generate sample data for testing and demonstration purposes.
-    This will create addresses, validations, deliveries, and agents.
-    """)
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("#### Configuration")
-        
-        num_addresses = st.slider(
-            "Number of Addresses",
-            min_value=10,
-            max_value=200,
-            value=50,
-            step=10
-        )
-        
-        num_agents = st.slider(
-            "Number of Agents",
-            min_value=5,
-            max_value=20,
-            value=10
-        )
-        
-        deliveries_per_address = st.slider(
-            "Deliveries per Address",
-            min_value=5,
-            max_value=30,
-            value=15
-        )
-        
-        include_validations = st.checkbox("Generate Validations", value=True)
-        include_verifications = st.checkbox("Generate Verifications", value=True)
-    
-    with col2:
-        st.markdown("#### Cities Distribution")
-        
-        cities = [
-            "New Delhi", "Mumbai", "Bangalore", "Chennai", "Kolkata",
-            "Hyderabad", "Pune", "Ahmedabad", "Jaipur", "Lucknow"
-        ]
-        
-        for city in cities:
-            st.checkbox(city, value=True, key=f"city_{city}")
-    
-    st.divider()
-    
-    if st.button("🚀 Generate Sample Data", type="primary"):
-        progress = st.progress(0)
-        status = st.empty()
-        
-        try:
-            # Generate agents
-            status.text("Creating agents...")
-            agent_ids = []
-            
-            agent_names = [
-                "Rahul Kumar", "Priya Sharma", "Amit Singh", "Neha Patel",
-                "Vikram Reddy", "Anjali Gupta", "Rajesh Verma", "Sunita Devi",
-                "Mohit Agarwal", "Kavita Nair", "Suresh Yadav", "Pooja Mishra",
-                "Arun Krishnan", "Deepa Menon", "Sanjay Chauhan"
-            ]
-            
-            for i in range(num_agents):
-                name = agent_names[i % len(agent_names)]
-                email = f"{name.lower().replace(' ', '.')}@aava.in"
-                
-                # Check if exists
-                existing = db.get_agent_by_email(email)
-                if existing:
-                    agent_ids.append(existing['id'])
-                else:
-                    try:
-                        agent_id = db.create_agent({
-                            'name': name,
-                            'email': email,
-                            'phone': f"+91-98{random.randint(10000000, 99999999)}",
-                            'certification_date': (datetime.now() - timedelta(days=random.randint(30, 365))).isoformat(),
-                            'certification_expiry': (datetime.now() + timedelta(days=random.randint(180, 365))).isoformat(),
-                            'active': 1,
-                            'performance_score': random.uniform(0.7, 0.95)
-                        })
-                        agent_ids.append(agent_id)
-                    except ValueError:
-                        # Agent with same email/phone exists, skip
-                        pass
-            
-            progress.progress(0.2)
-            
-            # Generate addresses
-            status.text("Creating addresses...")
-            
-            city_coords = {
-                "New Delhi": (28.6139, 77.2090),
-                "Mumbai": (19.0760, 72.8777),
-                "Bangalore": (12.9716, 77.5946),
-                "Chennai": (13.0827, 80.2707),
-                "Kolkata": (22.5726, 88.3639),
-                "Hyderabad": (17.3850, 78.4867),
-                "Pune": (18.5204, 73.8567),
-                "Ahmedabad": (23.0225, 72.5714),
-                "Jaipur": (26.9124, 75.7873),
-                "Lucknow": (26.8467, 80.9462)
-            }
-            
-            selected_cities = [c for c in cities if st.session_state.get(f"city_{c}", True)]
-            if not selected_cities:
-                selected_cities = cities
-            
-            address_ids = []
-            
-            for i in range(num_addresses):
-                city = selected_cities[i % len(selected_cities)]
-                base_lat, base_lon = city_coords[city]
-                
-                # Add random offset
-                lat = base_lat + random.uniform(-0.05, 0.05)
-                lon = base_lon + random.uniform(-0.05, 0.05)
-                
-                # Generate DIGIPIN
-                digipin_result = validator.encode(lat, lon)
-                
-                # Generate scores
-                score = random.gauss(70, 15)
-                score = max(0, min(100, score))
-                grade = get_grade(score)
-                
-                # Create address
-                address_id = db.create_address({
-                    'digital_address': f"user{i+1}@{city.lower().replace(' ', '')}.in",
-                    'digipin': digipin_result.digipin,
-                    'descriptive_address': f"{random.randint(1, 999)} Sample Street, {city}",
-                    'latitude': lat,
-                    'longitude': lon,
-                    'city': city,
-                    'state': 'Sample State',
-                    'pincode': f"{random.randint(100000, 999999)}",
-                    'confidence_score': round(score, 2),
-                    'confidence_grade': grade
-                })
-                address_ids.append(address_id)
-                
-                progress.progress(0.2 + 0.4 * (i + 1) / num_addresses)
-            
-            # Generate deliveries
-            status.text("Creating delivery records...")
-            
-            for addr_id in address_ids:
-                for j in range(deliveries_per_address):
-                    addr = db.get_address(addr_id)
-                    
-                    status_choice = random.choices(
-                        ['DELIVERED', 'DELIVERED_WITH_DIFFICULTY', 'FAILED'],
-                        weights=[0.75, 0.15, 0.10]
-                    )[0]
-                    
-                    db.create_delivery({
-                        'address_id': addr_id,
-                        'status': status_choice,
-                        'actual_latitude': addr['latitude'] + random.gauss(0, 0.0002),
-                        'actual_longitude': addr['longitude'] + random.gauss(0, 0.0002),
-                        'ease_rating': random.randint(3, 5) if status_choice == 'DELIVERED' else None,
-                        'delivery_partner': random.choice(['Partner A', 'Partner B', 'Partner C']),
-                        'timestamp': (datetime.now() - timedelta(days=random.randint(1, 180))).isoformat()
-                    })
-            
-            progress.progress(0.7)
-            
-            # Generate validations
-            if include_validations:
-                status.text("Creating validations...")
-                
-                for i, addr_id in enumerate(address_ids[:int(num_addresses * 0.7)]):
-                    addr = db.get_address(addr_id)
-                    
-                    val_id = db.create_validation({
-                        'address_id': addr_id,
-                        'digital_address': addr.get('digital_address'),
-                        'digipin': addr.get('digipin'),
-                        'descriptive_address': addr.get('descriptive_address'),
-                        'validation_type': random.choice(['PHYSICAL', 'DIGITAL', 'HYBRID']),
-                        'status': random.choice(['PENDING', 'IN_PROGRESS', 'COMPLETED', 'COMPLETED']),
-                        'priority': random.choice(['LOW', 'NORMAL', 'NORMAL', 'HIGH', 'URGENT']),
-                        'assigned_agent_id': random.choice(agent_ids) if agent_ids else None
-                    })
-                    
-                    # Generate verification for completed ones
-                    if include_verifications and random.random() > 0.3:
-                        db.create_verification({
-                            'validation_id': val_id,
-                            'agent_id': random.choice(agent_ids) if agent_ids else 'AGT-001',
-                            'verified': 1 if random.random() > 0.1 else 0,
-                            'quality_score': random.uniform(0.7, 0.98),
-                            'evidence_type': random.choice(['photo', 'photo+signature', 'video']),
-                            'gps_latitude': addr['latitude'],
-                            'gps_longitude': addr['longitude'],
-                            'gps_accuracy': random.uniform(3, 15),
-                            'notes': 'Sample verification'
-                        })
-            
-            progress.progress(1.0)
-            
-            status.text("✅ Sample data generated successfully!")
-            
-            st.success(f"""
-            ✅ **Sample Data Generated Successfully!**
-            
-            - 👥 **Agents:** {num_agents}
-            - 📍 **Addresses:** {num_addresses}
-            - 📦 **Deliveries:** {num_addresses * deliveries_per_address}
-            - 📋 **Validations:** {int(num_addresses * 0.7) if include_validations else 0}
-            """)
-            
-            # Log audit
-            db.log_audit({
-                'actor': 'admin',
-                'action': 'sample_data.generated',
-                'resource_type': 'system',
-                'resource_id': 'bulk',
-                'details': {
-                    'addresses': num_addresses,
-                    'agents': num_agents,
-                    'deliveries': num_addresses * deliveries_per_address
-                }
-            })
-        
-        except Exception as e:
-            st.error(f"❌ Error generating data: {str(e)}")
-    
-    # Clear data option
-    st.divider()
-    
-    with st.expander("⚠️ Danger Zone"):
-        st.warning("These actions are irreversible!")
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            if st.button("🗑️ Clear All Validations"):
-                # Would implement actual deletion
-                st.warning("This would delete all validations (not implemented in demo)")
-        
-        with col2:
-            if st.button("🗑️ Clear All Data"):
-                # Would implement actual deletion
-                st.warning("This would delete all data (not implemented in demo)")
-
-
-# =============================================================================
-# TAB 5: AUDIT LOGS
-# =============================================================================
-
-with tab5:
     st.markdown("### 📝 Audit Logs")
     
     st.markdown("View system audit trail for all operations.")

@@ -127,31 +127,8 @@ def agent_login_form():
             with col_a:
                 submit = st.form_submit_button("🔑 Login", use_container_width=True)
             
-            with col_b:
-                demo = st.form_submit_button("👤 Demo Login", use_container_width=True)
-            
-            if submit or demo:
-                if demo:
-                    # Create or get demo agent
-                    demo_agent = db.get_agent_by_email("demo.agent@aava.in")
-                    
-                    if not demo_agent:
-                        demo_agent_id = db.create_agent({
-                            'name': 'Demo Agent',
-                            'email': 'demo.agent@aava.in',
-                            'phone': '+91-9876543210',
-                            'certification_date': '2024-01-01',
-                            'certification_expiry': '2025-12-31',
-                            'active': 1,
-                            'performance_score': 0.85
-                        })
-                        demo_agent = db.get_agent(demo_agent_id)
-                    
-                    st.session_state.logged_in_agent = demo_agent
-                    st.success("✅ Demo login successful!")
-                    st.rerun()
-                
-                elif agent_id and email:
+            if submit:
+                if agent_id and email:
                     agent = db.get_agent_by_email(email)
                     
                     if agent and agent.get('id') == agent_id:
