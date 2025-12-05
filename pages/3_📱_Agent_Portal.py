@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from utils.database import get_database
 from utils.digipin import DIGIPINValidator
-from utils.confidence_score import ConfidenceCalculator, AddressData, VerificationRecord
+from utils.confidence_score import ConfidenceScoreCalculator, AddressData, PhysicalVerification
 
 st.set_page_config(
     page_title="Agent Portal - AAVA",
@@ -623,14 +623,14 @@ def agent_dashboard():
                                     # Build verification records for confidence calculation
                                     verification_records = []
                                     for v in all_verifications:
-                                        verification_records.append(VerificationRecord(
+                                        verification_records.append(PhysicalVerification(
                                             timestamp=datetime.fromisoformat(v.get('created_at', datetime.now().isoformat())),
                                             verified=bool(v.get('verified')),
                                             quality_score=float(v.get('quality_score', 0.5))
                                         ))
                                     
                                     # Add current verification
-                                    verification_records.append(VerificationRecord(
+                                    verification_records.append(PhysicalVerification(
                                         timestamp=datetime.now(),
                                         verified=is_verified,
                                         quality_score=calculated_quality
@@ -646,7 +646,7 @@ def agent_dashboard():
                                     )
                                     
                                     # Calculate new confidence score
-                                    calculator = ConfidenceCalculator()
+                                    calculator = ConfidenceScoreCalculator()
                                     result = calculator.calculate(address_data)
                                     
                                     # Update address with new confidence score
