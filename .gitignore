@@ -27,6 +27,10 @@ Thumbs.db
 # PDF files
 *.pdf
 
+# Presentation files
+AAVA_Presentation.html
+*.pptx
+
 # Utility scripts
 generate_pdf.py
 make_pdf.py
