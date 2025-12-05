@@ -257,20 +257,58 @@ class DatabaseManager:
                 )
             """)
             
-            # Consents table
+            # Users table (for AIA - Address Issuance Authority)
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS users (
+                    id TEXT PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    email TEXT UNIQUE NOT NULL,
+                    phone TEXT UNIQUE,
+                    password TEXT NOT NULL,
+                    aadhaar_hash TEXT,
+                    verified INTEGER DEFAULT 0,
+                    active INTEGER DEFAULT 1,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    last_login TIMESTAMP
+                )
+            """)
+            
+            # User addresses - linking users to their addresses
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS user_addresses (
+                    id TEXT PRIMARY KEY,
+                    user_id TEXT NOT NULL,
+                    address_id TEXT NOT NULL,
+                    label TEXT DEFAULT 'Home',
+                    is_primary INTEGER DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (user_id) REFERENCES users(id),
+                    FOREIGN KEY (address_id) REFERENCES addresses(id),
+                    UNIQUE(user_id, address_id)
+                )
+            """)
+            
+            # Consents table (enhanced for AIA authorization framework)
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS consents (
                     id TEXT PRIMARY KEY,
-                    subject_id TEXT,
-                    granter TEXT,
-                    grantee TEXT,
-                    scope TEXT,
+                    user_id TEXT NOT NULL,
+                    address_id TEXT NOT NULL,
+                    grantee_name TEXT NOT NULL,
+                    grantee_type TEXT DEFAULT 'AIU',
+                    purpose TEXT,
+                    scope TEXT DEFAULT 'view',
+                    access_token TEXT UNIQUE,
                     consent_artifact TEXT,
                     issued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     expires_at TIMESTAMP,
+                    access_count INTEGER DEFAULT 0,
+                    last_accessed TIMESTAMP,
                     revoked INTEGER DEFAULT 0,
                     revoked_at TIMESTAMP,
-                    revocation_reason TEXT
+                    revocation_reason TEXT,
+                    FOREIGN KEY (user_id) REFERENCES users(id),
+                    FOREIGN KEY (address_id) REFERENCES addresses(id)
                 )
             """)
             
@@ -296,6 +334,10 @@ class DatabaseManager:
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_validations_agent ON validations(assigned_agent_id)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_deliveries_address ON deliveries(address_id)")
             cursor.execute("CREATE INDEX IF NOT EXISTS idx_verifications_validation ON verifications(validation_id)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_user_addresses_user ON user_addresses(user_id)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_consents_user ON consents(user_id)")
+            cursor.execute("CREATE INDEX IF NOT EXISTS idx_consents_token ON consents(access_token)")
             
             conn.commit()
             print(f"✓ Database initialized at {self.db_path}")
@@ -706,6 +748,313 @@ class DatabaseManager:
                 'success_rate': (ver_stats['successful'] or 0) / max(ver_stats['total'] or 1, 1)
             }
     
+    # -------------------------------------------------------------------------
+    # USER OPERATIONS (AIA - Address Issuance Authority)
+    # -------------------------------------------------------------------------
+    
+    def create_user(self, data: Dict) -> str:
+        """Create a new user account."""
+        import hashlib
+        user_id = data.get('id') or self._generate_id("USR")
+        email = data.get('email')
+        phone = data.get('phone')
+        
+        # Hash password
+        password = data.get('password', '')
+        password_hash = hashlib.sha256(password.encode()).hexdigest()
+        
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            # Check duplicate email
+            if email:
+                cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
+                if cursor.fetchone():
+                    raise ValueError(f"Email '{email}' already registered")
+            
+            # Check duplicate phone
+            if phone:
+                cursor.execute("SELECT id FROM users WHERE phone = ?", (phone,))
+                if cursor.fetchone():
+                    raise ValueError(f"Phone '{phone}' already registered")
+            
+            cursor.execute("""
+                INSERT INTO users (
+                    id, name, email, phone, password, aadhaar_hash, verified, active
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                user_id,
+                data.get('name'),
+                email,
+                phone,
+                password_hash,
+                data.get('aadhaar_hash'),
+                data.get('verified', 0),
+                data.get('active', 1)
+            ))
+            conn.commit()
+        
+        return user_id
+    
+    def get_user(self, user_id: str) -> Optional[Dict]:
+        """Get user by ID."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+            return self._row_to_dict(cursor.fetchone())
+    
+    def get_user_by_email(self, email: str) -> Optional[Dict]:
+        """Get user by email."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
+            return self._row_to_dict(cursor.fetchone())
+    
+    def authenticate_user(self, email: str, password: str) -> Optional[Dict]:
+        """Authenticate user by email and password."""
+        import hashlib
+        password_hash = hashlib.sha256(password.encode()).hexdigest()
+        
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT * FROM users WHERE email = ? AND password = ? AND active = 1",
+                (email, password_hash)
+            )
+            user = self._row_to_dict(cursor.fetchone())
+            
+            if user:
+                # Update last login
+                cursor.execute(
+                    "UPDATE users SET last_login = ? WHERE id = ?",
+                    (datetime.now().isoformat(), user['id'])
+                )
+                conn.commit()
+            
+            return user
+    
+    def update_user(self, user_id: str, data: Dict) -> bool:
+        """Update a user record."""
+        # If password is being updated, hash it
+        if 'password' in data:
+            import hashlib
+            data['password'] = hashlib.sha256(data['password'].encode()).hexdigest()
+        
+        set_clause = ", ".join([f"{k} = ?" for k in data.keys()])
+        values = list(data.values()) + [user_id]
+        
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                f"UPDATE users SET {set_clause} WHERE id = ?",
+                values
+            )
+            conn.commit()
+            return cursor.rowcount > 0
+    
+    # -------------------------------------------------------------------------
+    # USER ADDRESS OPERATIONS
+    # -------------------------------------------------------------------------
+    
+    def link_address_to_user(self, user_id: str, address_id: str, label: str = "Home", is_primary: bool = False) -> str:
+        """Link an address to a user."""
+        link_id = self._generate_id("UAL")
+        
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            # If primary, unset other primaries for this user
+            if is_primary:
+                cursor.execute(
+                    "UPDATE user_addresses SET is_primary = 0 WHERE user_id = ?",
+                    (user_id,)
+                )
+            
+            cursor.execute("""
+                INSERT INTO user_addresses (id, user_id, address_id, label, is_primary)
+                VALUES (?, ?, ?, ?, ?)
+            """, (link_id, user_id, address_id, label, 1 if is_primary else 0))
+            conn.commit()
+        
+        return link_id
+    
+    def get_user_addresses(self, user_id: str) -> List[Dict]:
+        """Get all addresses linked to a user."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT ua.*, a.digital_address, a.digipin, a.descriptive_address,
+                       a.latitude, a.longitude, a.city, a.state, a.pincode,
+                       a.confidence_score, a.confidence_grade
+                FROM user_addresses ua
+                JOIN addresses a ON ua.address_id = a.id
+                WHERE ua.user_id = ?
+                ORDER BY ua.is_primary DESC, ua.created_at DESC
+            """, (user_id,))
+            return [self._row_to_dict(row) for row in cursor.fetchall()]
+    
+    def unlink_address_from_user(self, user_id: str, address_id: str) -> bool:
+        """Remove address link from user."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "DELETE FROM user_addresses WHERE user_id = ? AND address_id = ?",
+                (user_id, address_id)
+            )
+            conn.commit()
+            return cursor.rowcount > 0
+    
+    def update_user_address(self, user_id: str, address_id: str, data: Dict) -> bool:
+        """Update user address link (label, primary status)."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            
+            # If setting as primary, unset others first
+            if data.get('is_primary'):
+                cursor.execute(
+                    "UPDATE user_addresses SET is_primary = 0 WHERE user_id = ?",
+                    (user_id,)
+                )
+            
+            set_clause = ", ".join([f"{k} = ?" for k in data.keys()])
+            values = list(data.values()) + [user_id, address_id]
+            
+            cursor.execute(
+                f"UPDATE user_addresses SET {set_clause} WHERE user_id = ? AND address_id = ?",
+                values
+            )
+            conn.commit()
+            return cursor.rowcount > 0
+    
+    # -------------------------------------------------------------------------
+    # CONSENT OPERATIONS (Authorization Framework)
+    # -------------------------------------------------------------------------
+    
+    def create_consent(self, data: Dict) -> str:
+        """Create a new consent grant for address sharing."""
+        import secrets
+        consent_id = data.get('id') or self._generate_id("CON")
+        access_token = secrets.token_urlsafe(32)
+        
+        # Default expiry: 30 days
+        expires_at = data.get('expires_at')
+        if not expires_at:
+            expires_at = (datetime.now() + timedelta(days=30)).isoformat()
+        
+        consent_artifact = json.dumps({
+            'consent_id': consent_id,
+            'user_id': data.get('user_id'),
+            'address_id': data.get('address_id'),
+            'grantee_name': data.get('grantee_name'),
+            'grantee_type': data.get('grantee_type', 'AIU'),
+            'purpose': data.get('purpose'),
+            'scope': data.get('scope', 'view'),
+            'issued_at': datetime.now().isoformat(),
+            'expires_at': expires_at
+        })
+        
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO consents (
+                    id, user_id, address_id, grantee_name, grantee_type,
+                    purpose, scope, access_token, consent_artifact, expires_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                consent_id,
+                data.get('user_id'),
+                data.get('address_id'),
+                data.get('grantee_name'),
+                data.get('grantee_type', 'AIU'),
+                data.get('purpose'),
+                data.get('scope', 'view'),
+                access_token,
+                consent_artifact,
+                expires_at
+            ))
+            conn.commit()
+        
+        return consent_id, access_token
+    
+    def get_consent(self, consent_id: str) -> Optional[Dict]:
+        """Get consent by ID."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM consents WHERE id = ?", (consent_id,))
+            return self._row_to_dict(cursor.fetchone())
+    
+    def get_consent_by_token(self, access_token: str) -> Optional[Dict]:
+        """Get consent by access token (for AIU access)."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT c.*, a.digital_address, a.digipin, a.descriptive_address,
+                       a.latitude, a.longitude, a.city, a.state, a.pincode,
+                       a.confidence_score, a.confidence_grade
+                FROM consents c
+                JOIN addresses a ON c.address_id = a.id
+                WHERE c.access_token = ? AND c.revoked = 0
+                  AND (c.expires_at IS NULL OR c.expires_at > datetime('now'))
+            """, (access_token,))
+            consent = self._row_to_dict(cursor.fetchone())
+            
+            if consent:
+                # Increment access count and update last accessed
+                cursor.execute("""
+                    UPDATE consents 
+                    SET access_count = access_count + 1, last_accessed = ?
+                    WHERE id = ?
+                """, (datetime.now().isoformat(), consent['id']))
+                conn.commit()
+            
+            return consent
+    
+    def get_user_consents(self, user_id: str, include_revoked: bool = False) -> List[Dict]:
+        """Get all consents granted by a user."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            if include_revoked:
+                cursor.execute("""
+                    SELECT c.*, a.digital_address, a.digipin
+                    FROM consents c
+                    JOIN addresses a ON c.address_id = a.id
+                    WHERE c.user_id = ?
+                    ORDER BY c.issued_at DESC
+                """, (user_id,))
+            else:
+                cursor.execute("""
+                    SELECT c.*, a.digital_address, a.digipin
+                    FROM consents c
+                    JOIN addresses a ON c.address_id = a.id
+                    WHERE c.user_id = ? AND c.revoked = 0
+                    ORDER BY c.issued_at DESC
+                """, (user_id,))
+            return [self._row_to_dict(row) for row in cursor.fetchall()]
+    
+    def revoke_consent(self, consent_id: str, reason: str = None) -> bool:
+        """Revoke a consent."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE consents 
+                SET revoked = 1, revoked_at = ?, revocation_reason = ?
+                WHERE id = ?
+            """, (datetime.now().isoformat(), reason, consent_id))
+            conn.commit()
+            return cursor.rowcount > 0
+    
+    def get_address_consents(self, address_id: str) -> List[Dict]:
+        """Get all active consents for an address."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT * FROM consents 
+                WHERE address_id = ? AND revoked = 0
+                  AND (expires_at IS NULL OR expires_at > datetime('now'))
+                ORDER BY issued_at DESC
+            """, (address_id,))
+            return [self._row_to_dict(row) for row in cursor.fetchall()]
+
     # -------------------------------------------------------------------------
     # DELIVERY OPERATIONS
     # -------------------------------------------------------------------------

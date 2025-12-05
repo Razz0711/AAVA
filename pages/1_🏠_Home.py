@@ -42,9 +42,25 @@ st.markdown("""
 # Feature cards
 st.markdown("## 🚀 Quick Access")
 
+# First row - 4 cards
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
+    st.markdown("""
+    <div style="background: white; padding: 1.5rem; border-radius: 12px; 
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
+                border-left: 4px solid #667eea;">
+        <h3 style="margin: 0;">👤</h3>
+        <h4 style="margin: 0.5rem 0;">User Portal</h4>
+        <p style="color: #666; font-size: 0.9rem; margin: 0;">
+            Manage your digital addresses
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    if st.button("Open →", key="btn_user"):
+        st.switch_page("pages/7_👤_User_Portal.py")
+
+with col2:
     st.markdown("""
     <div style="background: white; padding: 1.5rem; border-radius: 12px; 
                 box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
@@ -52,14 +68,14 @@ with col1:
         <h3 style="margin: 0;">✅</h3>
         <h4 style="margin: 0.5rem 0;">Validation Request</h4>
         <p style="color: #666; font-size: 0.9rem; margin: 0;">
-            Submit new address validation requests
+            Submit validation requests
         </p>
     </div>
     """, unsafe_allow_html=True)
     if st.button("Open →", key="btn_val"):
         st.switch_page("pages/2_✅_Validation_Request.py")
 
-with col2:
+with col3:
     st.markdown("""
     <div style="background: white; padding: 1.5rem; border-radius: 12px; 
                 box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
@@ -67,14 +83,14 @@ with col2:
         <h3 style="margin: 0;">📱</h3>
         <h4 style="margin: 0.5rem 0;">Agent Portal</h4>
         <p style="color: #666; font-size: 0.9rem; margin: 0;">
-            Field agent verification portal
+            Field agent verification
         </p>
     </div>
     """, unsafe_allow_html=True)
     if st.button("Open →", key="btn_agent"):
         st.switch_page("pages/3_📱_Agent_Portal.py")
 
-with col3:
+with col4:
     st.markdown("""
     <div style="background: white; padding: 1.5rem; border-radius: 12px; 
                 box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
@@ -82,14 +98,17 @@ with col3:
         <h3 style="margin: 0;">📊</h3>
         <h4 style="margin: 0.5rem 0;">Confidence Score</h4>
         <p style="color: #666; font-size: 0.9rem; margin: 0;">
-            View address confidence scores
+            View address scores
         </p>
     </div>
     """, unsafe_allow_html=True)
     if st.button("Open →", key="btn_score"):
         st.switch_page("pages/4_📊_Confidence_Score.py")
 
-with col4:
+# Second row - more options
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
     st.markdown("""
     <div style="background: white; padding: 1.5rem; border-radius: 12px; 
                 box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
@@ -103,6 +122,21 @@ with col4:
     """, unsafe_allow_html=True)
     if st.button("Open →", key="btn_admin"):
         st.switch_page("pages/5_⚙️_Admin_Panel.py")
+
+with col2:
+    st.markdown("""
+    <div style="background: white; padding: 1.5rem; border-radius: 12px; 
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
+                border-left: 4px solid #00BCD4;">
+        <h3 style="margin: 0;">🤖</h3>
+        <h4 style="margin: 0.5rem 0;">AI Chat</h4>
+        <p style="color: #666; font-size: 0.9rem; margin: 0;">
+            Ask me anything!
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    if st.button("Open →", key="btn_chat"):
+        st.switch_page("pages/6_🤖_AI_Chat.py")
 
 st.divider()
 
@@ -137,22 +171,22 @@ with col2:
     st.markdown("""
     ### DHRUVA Ecosystem
     
-    AAVA integrates with these DHRUVA components:
+    AAVA implements these DHRUVA components:
     
     | Component | Role |
     |-----------|------|
-    | **AIA** | Address Information Agent (field verification) |
+    | **AIA** | Address Issuance Authority (user consent & address management) |
     | **AIP** | Address Information Provider (address registry) |
     | **AIU** | Address Information User (service consumers) |
     | **CM** | Central Mapper (DIGIPIN registry) |
     
-    ### DIGIPIN System
+    ### AIA Features (User Portal)
     
-    DIGIPIN is a 10-character geo-coded grid system:
-    - Covers all of India (2.5°-38.5°N, 63.5°-99.5°E)
-    - ~4m × 4m resolution at finest level
-    - Format: `XXX-XXX-XXXX` (e.g., `3PJ-K4M-5L2T`)
-    - Uses 16 characters: `2,3,4,5,6,7,8,9,C,F,J,K,L,M,P,T`
+    - 👤 **User Accounts**: Register, login, manage profile
+    - 🏠 **Address Management**: Create, update, delete addresses
+    - 🔐 **Consent Control**: Grant/revoke access to third parties
+    - 🔗 **Address Sharing**: Generate secure tokens for AIUs
+    - 📜 **Access History**: Track who accessed your data
     """)
 
 st.divider()
