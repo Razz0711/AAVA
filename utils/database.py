@@ -1233,65 +1233,6 @@ class DatabaseManager:
             return results
     
     # -------------------------------------------------------------------------
-    # CONSENT OPERATIONS
-    # -------------------------------------------------------------------------
-    
-    def create_consent(self, data: Dict) -> str:
-        """Create a new consent record."""
-        consent_id = data.get('id') or self._generate_id("CON")
-        
-        with self.get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("""
-                INSERT INTO consents (
-                    id, subject_id, granter, grantee, scope,
-                    consent_artifact, issued_at, expires_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                consent_id,
-                data.get('subject_id'),
-                data.get('granter'),
-                data.get('grantee'),
-                json.dumps(data.get('scope', [])),
-                data.get('consent_artifact'),
-                data.get('issued_at', datetime.now().isoformat()),
-                data.get('expires_at')
-            ))
-            conn.commit()
-        
-        return consent_id
-    
-    def get_consent(self, consent_id: str) -> Optional[Dict]:
-        """Get consent by ID."""
-        with self.get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM consents WHERE id = ?", (consent_id,))
-            row = cursor.fetchone()
-            if row:
-                d = self._row_to_dict(row)
-                if d.get('scope'):
-                    try:
-                        d['scope'] = json.loads(d['scope'])
-                    except:
-                        pass
-                return d
-            return None
-    
-    def revoke_consent(self, consent_id: str, reason: str = None) -> bool:
-        """Revoke a consent."""
-        with self.get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute("""
-                UPDATE consents 
-                SET revoked = 1, 
-                    revoked_at = ?,
-                    revocation_reason = ?
-                WHERE id = ?
-            """, (datetime.now().isoformat(), reason, consent_id))
-            conn.commit()
-            return cursor.rowcount > 0
-    
-    # -------------------------------------------------------------------------
     # AUDIT LOG OPERATIONS
     # -------------------------------------------------------------------------
     
