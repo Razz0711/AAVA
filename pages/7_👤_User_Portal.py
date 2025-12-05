@@ -435,39 +435,79 @@ def show_user_dashboard():
                         decode_result = digipin_validator.decode(digipin)
                         
                         try:
-                            # Create address
-                            address_id = db.create_address({
-                                'digipin': digipin.upper().replace('-', ''),
-                                'digital_address': digital_addr if digital_addr else None,
-                                'descriptive_address': descriptive,
-                                'latitude': decode_result.center_lat,
-                                'longitude': decode_result.center_lon,
-                                'city': city,
-                                'state': state,
-                                'pincode': pincode,
-                                'confidence_score': 50,  # Initial score
-                                'confidence_grade': 'C'
-                            })
+                            # Check if digital address already exists (user wants to update location)
+                            existing_address = None
+                            if digital_addr:
+                                existing_address = db.get_address_by_digital_address(digital_addr)
                             
-                            # Link to user
-                            db.link_address_to_user(user['id'], address_id, label, is_primary)
-                            
-                            # Auto-create validation request for agent verification
-                            validation_id = db.create_validation({
-                                'address_id': address_id,
-                                'digital_address': digital_addr if digital_addr else None,
-                                'digipin': digipin.upper().replace('-', ''),
-                                'descriptive_address': descriptive,
-                                'validation_type': 'PHYSICAL',
-                                'status': 'PENDING',
-                                'priority': 'NORMAL',
-                                'requester_id': user['id'],
-                                'notes': f'Auto-created for new address registration by {user.get("name", "user")}'
-                            })
-                            
-                            st.success(f"✅ Address created! ID: {address_id}")
-                            st.info(f"📋 Validation request **{validation_id}** auto-created. An agent will verify your address soon!")
-                            st.rerun()
+                            if existing_address:
+                                # UPDATE existing address with new location
+                                address_id = existing_address['id']
+                                db.update_address(address_id, {
+                                    'digipin': digipin.upper().replace('-', ''),
+                                    'descriptive_address': descriptive,
+                                    'latitude': decode_result.center_lat,
+                                    'longitude': decode_result.center_lon,
+                                    'city': city,
+                                    'state': state,
+                                    'pincode': pincode
+                                })
+                                
+                                # Check if already linked to user
+                                already_linked = any(ua['address_id'] == address_id for ua in user_addresses)
+                                if not already_linked:
+                                    db.link_address_to_user(user['id'], address_id, label, is_primary)
+                                
+                                # Create validation request for the new location
+                                validation_id = db.create_validation({
+                                    'address_id': address_id,
+                                    'digital_address': digital_addr,
+                                    'digipin': digipin.upper().replace('-', ''),
+                                    'descriptive_address': descriptive,
+                                    'validation_type': 'PHYSICAL',
+                                    'status': 'PENDING',
+                                    'priority': 'NORMAL',
+                                    'requester_id': user['id'],
+                                    'notes': f'Address location updated by {user.get("name", "user")}'
+                                })
+                                
+                                st.success(f"✅ Address location updated! Your digital address `{digital_addr}` now points to the new location.")
+                                st.info(f"📋 Validation request **{validation_id}** created. An agent will verify your new location soon!")
+                                st.rerun()
+                            else:
+                                # Create NEW address
+                                address_id = db.create_address({
+                                    'digipin': digipin.upper().replace('-', ''),
+                                    'digital_address': digital_addr if digital_addr else None,
+                                    'descriptive_address': descriptive,
+                                    'latitude': decode_result.center_lat,
+                                    'longitude': decode_result.center_lon,
+                                    'city': city,
+                                    'state': state,
+                                    'pincode': pincode,
+                                    'confidence_score': 50,  # Initial score
+                                    'confidence_grade': 'C'
+                                })
+                                
+                                # Link to user
+                                db.link_address_to_user(user['id'], address_id, label, is_primary)
+                                
+                                # Auto-create validation request for agent verification
+                                validation_id = db.create_validation({
+                                    'address_id': address_id,
+                                    'digital_address': digital_addr if digital_addr else None,
+                                    'digipin': digipin.upper().replace('-', ''),
+                                    'descriptive_address': descriptive,
+                                    'validation_type': 'PHYSICAL',
+                                    'status': 'PENDING',
+                                    'priority': 'NORMAL',
+                                    'requester_id': user['id'],
+                                    'notes': f'Auto-created for new address registration by {user.get("name", "user")}'
+                                })
+                                
+                                st.success(f"✅ Address created! ID: {address_id}")
+                                st.info(f"📋 Validation request **{validation_id}** auto-created. An agent will verify your address soon!")
+                                st.rerun()
                             
                         except Exception as e:
                             st.error(f"❌ Error: {str(e)}")
