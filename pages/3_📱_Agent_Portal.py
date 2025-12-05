@@ -14,6 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from utils.database import get_database
 from utils.digipin import DIGIPINValidator
+from utils.confidence_score import ConfidenceCalculator, AddressData, VerificationRecord
 
 st.set_page_config(
     page_title="Agent Portal - AAVA",
@@ -606,6 +607,56 @@ def agent_dashboard():
                             'successful_verifications': current_stats.get('successful_verifications', 0) + (1 if is_verified else 0),
                             'last_active': datetime.now().isoformat()
                         })
+                        
+                        # ============================================================
+                        # UPDATE CONFIDENCE SCORE AFTER VERIFICATION
+                        # ============================================================
+                        address_id = task.get('address_id')
+                        if address_id and is_verified:
+                            try:
+                                # Get the address
+                                address = db.get_address(address_id)
+                                if address:
+                                    # Get all verifications for this address
+                                    all_verifications = db.get_verifications_for_address(address_id)
+                                    
+                                    # Build verification records for confidence calculation
+                                    verification_records = []
+                                    for v in all_verifications:
+                                        verification_records.append(VerificationRecord(
+                                            timestamp=datetime.fromisoformat(v.get('created_at', datetime.now().isoformat())),
+                                            verified=bool(v.get('verified')),
+                                            quality_score=float(v.get('quality_score', 0.5))
+                                        ))
+                                    
+                                    # Add current verification
+                                    verification_records.append(VerificationRecord(
+                                        timestamp=datetime.now(),
+                                        verified=is_verified,
+                                        quality_score=calculated_quality
+                                    ))
+                                    
+                                    # Create address data for confidence calculation
+                                    address_data = AddressData(
+                                        address_id=address_id,
+                                        stated_lat=float(address.get('latitude', 0)),
+                                        stated_lon=float(address.get('longitude', 0)),
+                                        deliveries=[],  # No delivery data yet
+                                        verifications=verification_records
+                                    )
+                                    
+                                    # Calculate new confidence score
+                                    calculator = ConfidenceCalculator()
+                                    result = calculator.calculate(address_data)
+                                    
+                                    # Update address with new confidence score
+                                    db.update_address(address_id, {
+                                        'confidence_score': result.final_score
+                                    })
+                                    
+                            except Exception as score_error:
+                                # Log but don't fail the verification
+                                print(f"Warning: Could not update confidence score: {score_error}")
                         
                         # Log audit
                         db.log_audit({

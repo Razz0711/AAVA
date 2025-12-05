@@ -1199,6 +1199,27 @@ class DatabaseManager:
             )
             return [self._row_to_dict(row) for row in cursor.fetchall()]
     
+    def get_verifications_for_address(self, address_id: str) -> List[Dict]:
+        """Get all verifications for an address (via validations)."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT v.* FROM verifications v
+                JOIN validations val ON v.validation_id = val.id
+                WHERE val.address_id = ?
+                ORDER BY v.timestamp DESC
+            """, (address_id,))
+            results = []
+            for row in cursor.fetchall():
+                d = self._row_to_dict(row)
+                if d.get('photos'):
+                    try:
+                        d['photos'] = json.loads(d['photos'])
+                    except:
+                        pass
+                results.append(d)
+            return results
+    
     # -------------------------------------------------------------------------
     # CONSENT OPERATIONS
     # -------------------------------------------------------------------------
