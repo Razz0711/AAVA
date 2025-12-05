@@ -501,12 +501,22 @@ with tab2:
         st.markdown("<br>", unsafe_allow_html=True)
         refresh_btn = st.button("🔄 Refresh", use_container_width=True)
     
-    # Get validations
+    # Get validations - filter by agent if agent is logged in
     try:
-        if status_filter == "All":
-            validations = db.get_all_validations(limit=50)
+        if is_agent_logged_in and not is_admin_logged_in:
+            # Agent sees only their assigned validations
+            agent_id = st.session_state.logged_in_agent.get('id')
+            validations = db.get_validations_by_agent(agent_id)
+            
+            # Apply status filter
+            if status_filter != "All":
+                validations = [v for v in validations if v.get('status') == status_filter]
         else:
-            validations = db.get_validations_by_status(status_filter)
+            # Admin sees all validations
+            if status_filter == "All":
+                validations = db.get_all_validations(limit=50)
+            else:
+                validations = db.get_validations_by_status(status_filter)
         
         if search_query:
             search_lower = search_query.lower()
