@@ -14,7 +14,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from utils.database import get_database
 from utils.digipin import DIGIPINValidator
-from utils.confidence_score import ConfidenceScoreCalculator, AddressData, PhysicalVerification
 
 st.set_page_config(
     page_title="Agent Portal - AAVA",
@@ -612,46 +611,28 @@ def agent_dashboard():
                         # UPDATE CONFIDENCE SCORE AFTER VERIFICATION
                         # ============================================================
                         address_id = task.get('address_id')
-                        if address_id and is_verified:
+                        if address_id:
                             try:
                                 # Get the address
                                 address = db.get_address(address_id)
                                 if address:
-                                    # Get all verifications for this address
-                                    all_verifications = db.get_verifications_for_address(address_id)
+                                    current_score = float(address.get('confidence_score', 50))
                                     
-                                    # Build verification records for confidence calculation
-                                    verification_records = []
-                                    for v in all_verifications:
-                                        verification_records.append(PhysicalVerification(
-                                            timestamp=datetime.fromisoformat(v.get('created_at', datetime.now().isoformat())),
-                                            verified=bool(v.get('verified')),
-                                            quality_score=float(v.get('quality_score', 0.5))
-                                        ))
-                                    
-                                    # Add current verification
-                                    verification_records.append(PhysicalVerification(
-                                        timestamp=datetime.now(),
-                                        verified=is_verified,
-                                        quality_score=calculated_quality
-                                    ))
-                                    
-                                    # Create address data for confidence calculation
-                                    address_data = AddressData(
-                                        address_id=address_id,
-                                        stated_lat=float(address.get('latitude', 0)),
-                                        stated_lon=float(address.get('longitude', 0)),
-                                        deliveries=[],  # No delivery data yet
-                                        verifications=verification_records
-                                    )
-                                    
-                                    # Calculate new confidence score
-                                    calculator = ConfidenceScoreCalculator()
-                                    result = calculator.calculate(address_data)
+                                    if is_verified:
+                                        # Physical verification adds 20% (PVS component)
+                                        # Quality score influences the boost
+                                        verification_boost = 20 * calculated_quality
+                                        new_score = min(100, current_score + verification_boost)
+                                        new_grade = 'A+' if new_score >= 90 else 'A' if new_score >= 80 else 'B' if new_score >= 70 else 'C' if new_score >= 60 else 'D' if new_score >= 50 else 'F'
+                                    else:
+                                        # Failed verification reduces score
+                                        new_score = max(0, current_score - 10)
+                                        new_grade = 'A+' if new_score >= 90 else 'A' if new_score >= 80 else 'B' if new_score >= 70 else 'C' if new_score >= 60 else 'D' if new_score >= 50 else 'F'
                                     
                                     # Update address with new confidence score
                                     db.update_address(address_id, {
-                                        'confidence_score': result.final_score
+                                        'confidence_score': new_score,
+                                        'confidence_grade': new_grade
                                     })
                                     
                             except Exception as score_error:

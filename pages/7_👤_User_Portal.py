@@ -265,6 +265,9 @@ def show_user_dashboard():
                     
                     st.markdown("---")
                     
+                    # Check if there's a pending validation for this address
+                    pending_validation = db.get_pending_validation_for_address(addr['address_id'])
+                    
                     # Actions
                     col1, col2, col3, col4, col5 = st.columns(5)
                     with col1:
@@ -284,13 +287,20 @@ def show_user_dashboard():
                         if st.button("🔗 Share Address", key=f"share_{addr['address_id']}"):
                             st.session_state[f"show_share_{addr['address_id']}"] = True
                     with col4:
-                        # Request Verification button
-                        if st.button("✅ Verify", key=f"verify_{addr['address_id']}", type="primary"):
-                            # Check if pending validation already exists
-                            existing_val = db.get_pending_validation_for_address(addr['address_id'])
-                            if existing_val:
-                                st.warning(f"⏳ Verification already pending: {existing_val.get('id')}")
-                            else:
+                        # Show verification status or button
+                        if pending_validation:
+                            # Show pending status instead of button
+                            status = pending_validation.get('status', 'PENDING')
+                            if status == 'PENDING':
+                                st.warning("⏳ Pending")
+                            elif status == 'IN_PROGRESS':
+                                st.info("🔄 In Progress")
+                        elif addr.get('confidence_score', 0) >= 70:
+                            # Already verified with good score
+                            st.success("✅ Verified")
+                        else:
+                            # Show verify button
+                            if st.button("✅ Verify", key=f"verify_{addr['address_id']}", type="primary"):
                                 validation_id = db.create_validation({
                                     'address_id': addr['address_id'],
                                     'digital_address': addr.get('digital_address'),
@@ -302,8 +312,8 @@ def show_user_dashboard():
                                     'requester_id': user['id'],
                                     'notes': f'Verification requested by user {user.get("name", "")}'
                                 })
-                                st.success(f"✅ Verification request created: {validation_id}")
-                                st.info("An agent will visit to verify your address soon!")
+                                st.success(f"✅ Request created!")
+                                st.rerun()
                     with col5:
                         if st.button("🗑️ Remove", key=f"remove_{addr['address_id']}", type="secondary"):
                             db.unlink_address_from_user(user['id'], addr['address_id'])
