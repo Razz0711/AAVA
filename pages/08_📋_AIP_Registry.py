@@ -25,9 +25,11 @@ db.initialize()
 # CSS
 st.markdown("""
 <style>
-    /* Wider sidebar to prevent truncation */
-    [data-testid="stSidebar"] { min-width: 280px !important; }
+    /* Sidebar - Wider to prevent text truncation */
+    [data-testid="stSidebar"] { min-width: 280px !important; width: 280px !important; }
+    [data-testid="stSidebar"] > div:first-child { width: 280px !important; }
     [data-testid="stSidebarNav"] ul { padding-top: 1rem; }
+    [data-testid="stSidebarNav"] a { white-space: nowrap !important; }
     [data-testid="stSidebarNav"] span { overflow: visible !important; text-overflow: clip !important; }
     .registry-stat {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);

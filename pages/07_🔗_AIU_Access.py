@@ -24,9 +24,11 @@ db.initialize()
 # CSS
 st.markdown("""
 <style>
-    /* Wider sidebar to prevent truncation */
-    [data-testid="stSidebar"] { min-width: 280px !important; }
+    /* Sidebar - Wider to prevent text truncation */
+    [data-testid="stSidebar"] { min-width: 280px !important; width: 280px !important; }
+    [data-testid="stSidebar"] > div:first-child { width: 280px !important; }
     [data-testid="stSidebarNav"] ul { padding-top: 1rem; }
+    [data-testid="stSidebarNav"] a { white-space: nowrap !important; }
     [data-testid="stSidebarNav"] span { overflow: visible !important; text-overflow: clip !important; }
     .success-card {
         background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
