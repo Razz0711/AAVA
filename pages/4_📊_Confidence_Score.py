@@ -216,113 +216,55 @@ with tab1:
         if address:
             st.success(f"✅ Address found: {address.get('id')}")
             
-            # Get delivery history for this address
-            deliveries = db.get_deliveries_by_address(address.get('id'))
+            # ============================================================
+            # USE STORED DATABASE SCORE (NOT RECALCULATED)
+            # ============================================================
+            stored_score = float(address.get('confidence_score', 50))
+            stored_grade = address.get('confidence_grade', 'C')
             
-            # Get verifications through validations
-            validations = db.get_all_validations(limit=100)
-            address_validations = [
-                v for v in validations 
-                if v.get('address_id') == address.get('id')
-            ]
+            # Determine grade if not stored
+            if not stored_grade or stored_grade == 'F':
+                if stored_score >= 90:
+                    stored_grade = 'A+'
+                elif stored_score >= 80:
+                    stored_grade = 'A'
+                elif stored_score >= 70:
+                    stored_grade = 'B'
+                elif stored_score >= 60:
+                    stored_grade = 'C'
+                elif stored_score >= 50:
+                    stored_grade = 'D'
+                else:
+                    stored_grade = 'F'
             
-            verifications = []
-            for val in address_validations:
-                ver_list = db.get_verifications_by_validation(val.get('id'))
-                verifications.extend(ver_list)
+            grade_descriptions = {
+                'A+': 'Excellent - Highly Reliable',
+                'A': 'Very Good - Reliable',
+                'B': 'Good - Mostly Reliable',
+                'C': 'Fair - Moderately Reliable',
+                'D': 'Poor - Low Reliability',
+                'F': 'Fail - Unreliable'
+            }
+            grade_description = grade_descriptions.get(stored_grade, 'Unknown')
             
-            # Build AddressData object
-            delivery_records = []
-            for d in deliveries:
-                try:
-                    status_str = d.get('status', 'PENDING')
-                    status = DeliveryStatus[status_str] if status_str in DeliveryStatus.__members__ else DeliveryStatus.PENDING
-                    
-                    delivery_records.append(DeliveryRecord(
-                        id=d.get('id', ''),
-                        timestamp=datetime.fromisoformat(d.get('timestamp', datetime.now().isoformat())),
-                        status=status,
-                        actual_lat=d.get('actual_latitude'),
-                        actual_lon=d.get('actual_longitude'),
-                        ease_rating=d.get('ease_rating')
-                    ))
-                except:
-                    pass
-            
-            verification_records = []
-            for v in verifications:
-                try:
-                    verification_records.append(PhysicalVerification(
-                        id=v.get('id', ''),
-                        agent_id=v.get('agent_id', ''),
-                        timestamp=datetime.fromisoformat(v.get('timestamp', datetime.now().isoformat())),
-                        verified=bool(v.get('verified')),
-                        quality_score=v.get('quality_score', 0.8),
-                        evidence_type=v.get('evidence_type', 'photo'),
-                        gps_accuracy=v.get('gps_accuracy', 10)
-                    ))
-                except:
-                    pass
-            
-            # If no real data, generate sample for demo
-            if not delivery_records:
-                st.info("📊 No delivery history found. Generating sample data for demonstration...")
-                
-                # Generate sample deliveries
-                for i in range(random.randint(8, 15)):
-                    days_ago = random.randint(1, 180)
-                    status = random.choices(
-                        [DeliveryStatus.DELIVERED, DeliveryStatus.DELIVERED_WITH_DIFFICULTY, DeliveryStatus.FAILED],
-                        weights=[0.75, 0.15, 0.10]
-                    )[0]
-                    
-                    delivery_records.append(DeliveryRecord(
-                        id=f"DEL-{i:04d}",
-                        timestamp=datetime.now() - timedelta(days=days_ago),
-                        status=status,
-                        actual_lat=address.get('latitude', 28.6) + random.gauss(0, 0.0001),
-                        actual_lon=address.get('longitude', 77.2) + random.gauss(0, 0.0001),
-                        ease_rating=random.randint(3, 5) if status == DeliveryStatus.DELIVERED else None
-                    ))
-            
-            if not verification_records and random.random() > 0.3:
-                verification_records.append(PhysicalVerification(
-                    id="VER-DEMO",
-                    agent_id="AGT-001",
-                    timestamp=datetime.now() - timedelta(days=random.randint(30, 120)),
-                    verified=True,
-                    quality_score=random.uniform(0.75, 0.95),
-                    evidence_type="photo",
-                    gps_accuracy=random.uniform(3, 10)
-                ))
-            
-            # Create address data object
-            address_data = AddressData(
-                address_id=address.get('id', 'UNKNOWN'),
-                stated_lat=address.get('latitude', 28.6139),
-                stated_lon=address.get('longitude', 77.2090),
-                created_at=datetime.fromisoformat(address.get('created_at', datetime.now().isoformat())) 
-                    if address.get('created_at') else datetime.now() - timedelta(days=180),
-                deliveries=delivery_records,
-                verifications=verification_records
-            )
-            
-            # Calculate score
-            result = calculator.calculate(address_data)
-            
-            # Display results
+            # Display results using STORED score
             col1, col2, col3 = st.columns([1, 2, 1])
             
             with col2:
                 # Score gauge
+                grade_color = {
+                    'A+': '#00897b', 'A': '#4CAF50', 'B': '#8BC34A', 
+                    'C': '#FFC107', 'D': '#FF9800', 'F': '#f44336'
+                }.get(stored_grade, '#9e9e9e')
+                
                 fig = go.Figure(go.Indicator(
                     mode="gauge+number",
-                    value=result.score,
+                    value=stored_score,
                     domain={'x': [0, 1], 'y': [0, 1]},
-                    title={'text': "Confidence Score", 'font': {'size': 24}},
+                    title={'text': "Confidence Score (from Database)", 'font': {'size': 24}},
                     gauge={
                         'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "darkblue"},
-                        'bar': {'color': get_grade_color(result.grade)},
+                        'bar': {'color': grade_color},
                         'bgcolor': "white",
                         'borderwidth': 2,
                         'bordercolor': "gray",
@@ -335,7 +277,7 @@ with tab1:
                         'threshold': {
                             'line': {'color': "black", 'width': 4},
                             'thickness': 0.75,
-                            'value': result.score
+                            'value': stored_score
                         }
                     }
                 ))
@@ -346,141 +288,77 @@ with tab1:
                 st.plotly_chart(fig, use_container_width=True)
                 
                 # Grade display
-                grade_color = get_grade_color(result.grade)
                 st.markdown(f"""
                 <div style="text-align: center; margin-top: -1rem;">
                     <span class="grade-badge" style="background: {grade_color};">
-                        {result.grade}
+                        {stored_grade}
                     </span>
-                    <p style="color: #666; margin-top: 0.5rem;">{result.grade_description}</p>
+                    <p style="color: #666; margin-top: 0.5rem;">{grade_description}</p>
                 </div>
                 """, unsafe_allow_html=True)
             
             st.divider()
             
-            # Component breakdown
-            st.markdown("### 📊 Score Components")
-            
-            cols = st.columns(4)
-            
-            component_icons = {
-                'delivery_success': '📦',
-                'spatial_consistency': '📍',
-                'temporal_freshness': '⏱️',
-                'physical_verification': '✅'
-            }
-            
-            for i, (key, comp) in enumerate(result.components.items()):
-                with cols[i]:
-                    icon = component_icons.get(key, '📊')
-                    color = get_grade_color(get_grade(comp.raw_value * 100))
-                    
-                    st.markdown(f"""
-                    <div class="component-card">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 1.5rem;">{icon}</span>
-                            <span style="font-size: 1.5rem; font-weight: 700; color: {color};">
-                                {comp.raw_value:.0%}
-                            </span>
-                        </div>
-                        <h4 style="margin: 0.5rem 0; font-size: 0.9rem;">{comp.name}</h4>
-                        <div class="component-bar">
-                            <div class="component-fill" style="width: {comp.raw_value*100}%; background: {color};"></div>
-                        </div>
-                        <p style="margin: 0.5rem 0 0 0; font-size: 0.75rem; color: #666;">
-                            Weight: {comp.weight:.0%} • Weighted: {comp.weighted_value:.3f}
-                        </p>
-                        <p style="margin: 0.25rem 0 0 0; font-size: 0.7rem; color: #999;">
-                            {comp.description[:50]}...
-                        </p>
-                    </div>
-                    """, unsafe_allow_html=True)
-            
-            st.divider()
-            
-            # Additional details
+            # Address Details
+            st.markdown("### 📋 Address Details")
             col1, col2 = st.columns(2)
             
             with col1:
-                st.markdown("#### 📦 Delivery History")
-                
-                if delivery_records:
-                    # Create dataframe
-                    df = pd.DataFrame([
-                        {
-                            'Date': d.timestamp.strftime('%Y-%m-%d'),
-                            'Status': d.status.value,
-                            'Rating': d.ease_rating or 'N/A'
-                        }
-                        for d in sorted(delivery_records, key=lambda x: x.timestamp, reverse=True)
-                    ])
-                    
-                    st.dataframe(df, use_container_width=True, hide_index=True)
-                    
-                    # Status pie chart
-                    status_counts = {}
-                    for d in delivery_records:
-                        status_counts[d.status.value] = status_counts.get(d.status.value, 0) + 1
-                    
-                    fig = px.pie(
-                        values=list(status_counts.values()),
-                        names=list(status_counts.keys()),
-                        color_discrete_sequence=['#4CAF50', '#FF9800', '#F44336']
-                    )
-                    fig.update_layout(height=250, margin=dict(l=20, r=20, t=30, b=20))
-                    st.plotly_chart(fig, use_container_width=True)
-                else:
-                    st.info("No delivery history")
+                st.markdown(f"""
+                **DIGIPIN:** `{address.get('digipin', 'N/A')}`  
+                **Digital Address:** {address.get('digital_address', 'N/A')}  
+                **Descriptive:** {address.get('descriptive_address', 'N/A')}  
+                **City:** {address.get('city', 'N/A')}  
+                **State:** {address.get('state', 'N/A')}  
+                **Pincode:** {address.get('pincode', 'N/A')}
+                """)
             
             with col2:
-                st.markdown("#### 📍 Address Details")
-                
-                # Display DIGIPIN
-                digipin = address.get('digipin', '')
-                if digipin:
-                    st.markdown(f"""
-                    <div style="background: #f5f5f5; padding: 1rem; border-radius: 8px; text-align: center;">
-                        <span style="font-family: monospace; font-size: 1.5rem; font-weight: 700;">
-                            {validator._format_digipin(digipin)}
-                        </span>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
                 st.markdown(f"""
-                **ID:** {address.get('id', 'N/A')}  
-                **Digital Address:** {address.get('digital_address') or 'Not set'}  
-                **City:** {address.get('city') or 'N/A'}  
-                **State:** {address.get('state') or 'N/A'}  
-                **PIN Code:** {address.get('pincode') or 'N/A'}
+                **Latitude:** {address.get('latitude', 'N/A')}  
+                **Longitude:** {address.get('longitude', 'N/A')}  
+                **Created:** {address.get('created_at', 'N/A')[:10] if address.get('created_at') else 'N/A'}  
+                **Updated:** {address.get('updated_at', 'N/A')[:10] if address.get('updated_at') else 'N/A'}
                 """)
-                
-                # Map
-                if address.get('latitude') and address.get('longitude'):
-                    fig = go.Figure(go.Scattermapbox(
-                        lat=[address.get('latitude')],
-                        lon=[address.get('longitude')],
-                        mode='markers',
-                        marker=go.scattermapbox.Marker(size=14, color='red'),
-                        text=[validator._format_digipin(digipin)],
-                        hoverinfo='text'
-                    ))
-                    
-                    fig.update_layout(
-                        mapbox_style="open-street-map",
-                        mapbox=dict(
-                            center=dict(lat=address.get('latitude'), lon=address.get('longitude')),
-                            zoom=15
-                        ),
-                        margin={"r":0,"t":0,"l":0,"b":0},
-                        height=200
-                    )
-                    st.plotly_chart(fig, use_container_width=True)
             
-            # Recommendations
-            if result.recommendations:
-                st.markdown("#### 💡 Recommendations")
-                for rec in result.recommendations:
-                    st.markdown(f"- {rec}")
+            st.divider()
+            
+            # Verification History
+            st.markdown("### ✅ Verification History")
+            
+            # Get verifications for this address
+            verifications = db.get_verifications_for_address(address.get('id'))
+            
+            if verifications:
+                for ver in verifications:
+                    status_icon = "✅" if ver.get('verified') else "❌"
+                    st.markdown(f"""
+                    - {status_icon} **{ver.get('id')}** - Quality: {ver.get('quality_score', 0)*100:.0f}% - 
+                    Agent: {ver.get('agent_id', 'N/A')} - Date: {ver.get('timestamp', 'N/A')[:10] if ver.get('timestamp') else 'N/A'}
+                    """)
+            else:
+                st.info("No verifications recorded yet. Request verification from User Portal.")
+            
+            st.divider()
+            
+            # Score explanation
+            st.markdown("### 📊 Score Components (Explanation)")
+            st.markdown("""
+            The confidence score is calculated based on 4 weighted components:
+            
+            | Component | Weight | Description |
+            |-----------|--------|-------------|
+            | **Delivery Success Rate (DSR)** | 30% | Based on historical delivery outcomes |
+            | **Spatial Consistency (SC)** | 30% | How accurately deliveries match stated coordinates |
+            | **Temporal Freshness (TF)** | 20% | Time since last successful verification |
+            | **Physical Verification (PVS)** | 20% | Agent verification status and quality |
+            
+            **How to improve your score:**
+            - ✅ Get your address verified by an agent (+15-20%)
+            - 📦 Successful deliveries improve DSR
+            - 📍 Consistent GPS coordinates improve SC
+            - ⏱️ Recent activity improves TF
+            """)
         
         else:
             st.error("❌ Address not found. Please check the search value.")
