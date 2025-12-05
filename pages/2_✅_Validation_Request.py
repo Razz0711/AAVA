@@ -128,6 +128,20 @@ tab1, tab2 = st.tabs(["📝 New Request", "📋 My Requests"])
 # -----------------------------------------------------------------------------
 
 with tab1:
+    # Block agents from creating new requests - they should only verify
+    if is_agent_logged_in and not is_admin_logged_in:
+        st.warning("🚫 **Agents cannot create new validation requests.**")
+        st.info("""
+        As a field agent, your role is to **verify** addresses assigned to you, not create new requests.
+        
+        **What you can do:**
+        - Go to **Agent Portal** to see your assigned tasks
+        - View the **My Requests** tab to track validation status
+        """)
+        if st.button("📱 Go to Agent Portal", type="primary"):
+            st.switch_page("pages/3_📱_Agent_Portal.py")
+        st.stop()
+    
     st.markdown("### Submit New Validation Request")
     
     col1, col2 = st.columns([2, 1])
