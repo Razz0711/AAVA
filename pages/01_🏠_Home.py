@@ -129,18 +129,51 @@ with col2:
     st.markdown("""
     <div style="background: white; padding: 1.5rem; border-radius: 12px; 
                 box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
-                border-left: 4px solid #11998e;">
-        <h3 style="margin: 0;">📋</h3>
-        <h4 style="margin: 0.5rem 0;">Address Registry</h4>
+                border-left: 4px solid #FF5722;">
+        <h3 style="margin: 0;">🔗</h3>
+        <h4 style="margin: 0.5rem 0;">AIU Access</h4>
         <p style="color: #666; font-size: 0.9rem; margin: 0;">
-            AIP + AIU Access
+            Token-based access
         </p>
     </div>
     """, unsafe_allow_html=True)
-    if st.button("Open →", key="btn_registry"):
-        st.switch_page("pages/07_📋_Address_Registry.py")
+    if st.button("Open →", key="btn_aiu"):
+        st.switch_page("pages/07_🔗_AIU_Access.py")
 
 with col3:
+    st.markdown("""
+    <div style="background: white; padding: 1.5rem; border-radius: 12px; 
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
+                border-left: 4px solid #11998e;">
+        <h3 style="margin: 0;">📋</h3>
+        <h4 style="margin: 0.5rem 0;">AIP Registry</h4>
+        <p style="color: #666; font-size: 0.9rem; margin: 0;">
+            Address registry
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    if st.button("Open →", key="btn_aip"):
+        st.switch_page("pages/08_📋_AIP_Registry.py")
+
+with col4:
+    st.markdown("""
+    <div style="background: white; padding: 1.5rem; border-radius: 12px; 
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
+                border-left: 4px solid #1e3a5f;">
+        <h3 style="margin: 0;">🗺️</h3>
+        <h4 style="margin: 0.5rem 0;">Central Mapper</h4>
+        <p style="color: #666; font-size: 0.9rem; margin: 0;">
+            DIGIPIN registry
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    if st.button("Open →", key="btn_cm"):
+        st.switch_page("pages/09_🗺️_Central_Mapper.py")
+
+# Row 3 - Support
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
     st.markdown("""
     <div style="background: white; padding: 1.5rem; border-radius: 12px; 
                 box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
@@ -153,22 +186,7 @@ with col3:
     </div>
     """, unsafe_allow_html=True)
     if st.button("Open →", key="btn_chat"):
-        st.switch_page("pages/08_🤖_AI_Chat.py")
-
-with col4:
-    st.markdown("""
-    <div style="background: white; padding: 1.5rem; border-radius: 12px; 
-                box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
-                border-left: 4px solid #6c757d;">
-        <h3 style="margin: 0;">🏠</h3>
-        <h4 style="margin: 0.5rem 0;">Dashboard</h4>
-        <p style="color: #666; font-size: 0.9rem; margin: 0;">
-            Main analytics
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-    if st.button("Open →", key="btn_dashboard"):
-        st.switch_page("app.py")
+        st.switch_page("pages/10_🤖_AI_Chat.py")
 
 st.divider()
 
@@ -201,22 +219,23 @@ with col1:
 
 with col2:
     st.markdown("""
-    ### DHRUVA Ecosystem
+    ### DHRUVA Ecosystem (Fully Implemented)
     
     | Component | Role | Page |
     |-----------|------|------|
     | **AIA** | Address Issuance Authority - User consent & address management | 👤 User Portal |
-    | **AIP** | Address Information Provider - Address registry & verification | 📋 Address Registry |
-    | **AIU** | Address Information User - Token-based access for services | 📋 Address Registry |
-    | **CM** | Central Mapper - DIGIPIN encoding/decoding registry | Dashboard |
+    | **AIP** | Address Information Provider - Address registry & verification | 📚 AIP Registry |
+    | **AIU** | Address Information User - Token-based access for services | 🔗 AIU Access |
+    | **CM** | Central Mapper - DIGIPIN encoding/decoding registry | 🗺️ Central Mapper |
     
     ### Complete Feature Set
     
     - 👤 **User Portal**: Registration, address management, consent control
-    - 📋 **Address Registry**: Combined AIP + AIU functionality
+    - 📚 **AIP Registry**: Address database, verification tracking, analytics
+    - 🔗 **AIU Access**: Token verification, address retrieval for third parties
+    - 🗺️ **Central Mapper**: DIGIPIN lookup, encoding, grid reference
     - 📊 **Confidence Scoring**: Multi-factor address quality scoring
     - 📱 **Agent Portal**: Field verification by certified agents
-    - 🤖 **AI Chat**: Intelligent support assistant
     """)
 
 st.divider()
