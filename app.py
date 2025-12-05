@@ -166,6 +166,15 @@ st.set_page_config(
 
 st.markdown("""
 <style>
+    /* Sidebar - Wider to prevent text truncation */
+    [data-testid="stSidebar"] {
+        min-width: 280px !important;
+        width: 280px !important;
+    }
+    [data-testid="stSidebar"] > div:first-child {
+        width: 280px !important;
+    }
+    
     /* Sidebar Navigation - Larger Text */
     [data-testid="stSidebarNav"] ul {
         padding-top: 1rem;
@@ -176,9 +185,12 @@ st.markdown("""
     [data-testid="stSidebarNav"] a {
         font-size: 1.05rem !important;
         padding: 0.6rem 1rem !important;
+        white-space: nowrap !important;
     }
     [data-testid="stSidebarNav"] span {
         font-size: 1.05rem !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
     }
     
     /* Main container styling */
