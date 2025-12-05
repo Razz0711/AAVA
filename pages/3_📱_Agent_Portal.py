@@ -233,6 +233,69 @@ def agent_dashboard():
     
     with tab1:
         st.markdown("### 📋 Your Assigned Tasks")
+        # Allow agent to create a new validation request
+        with st.expander("➕ Create Validation Request (Agent)", expanded=False):
+            st.markdown("Provide a DIGIPIN or Digital Address to create a validation request.\n\n")
+            col_a, col_b = st.columns(2)
+            with col_a:
+                input_digipin = st.text_input("DIGIPIN (optional)", placeholder="3PJK4M5L2T")
+                input_digital_address = st.text_input("Digital Address (optional)", placeholder="user@provider.in")
+                descriptive_address = st.text_area("Descriptive Address (optional)")
+            with col_b:
+                validation_type = st.selectbox("Validation Type", options=["PHYSICAL", "DIGITAL", "HYBRID"], index=0)
+                priority = st.selectbox("Priority", options=["NORMAL", "LOW", "HIGH", "URGENT"], index=0)
+                assign_to_self = st.checkbox("Assign to me and start (IN_PROGRESS)", value=False)
+
+            create_btn = st.button("Create Validation Request", type="primary")
+            if create_btn:
+                try:
+                    # Try to find existing address by digipin or digital address
+                    address_id = None
+                    if input_digipin:
+                        addr = db.get_address_by_digipin(input_digipin)
+                        if addr:
+                            address_id = addr.get('id')
+                    if not address_id and input_digital_address:
+                        addr = db.get_address_by_digital_address(input_digital_address)
+                        if addr:
+                            address_id = addr.get('id')
+
+                    # If no existing address, create minimal address record when digipin provided
+                    if not address_id and (input_digipin or descriptive_address or input_digital_address):
+                        new_addr = {
+                            'digipin': input_digipin or None,
+                            'digital_address': input_digital_address or None,
+                            'descriptive_address': descriptive_address or (input_digipin or input_digital_address),
+                            'confidence_score': 50,
+                            'confidence_grade': 'C'
+                        }
+                        address_id = db.create_address(new_addr)
+
+                    validation_payload = {
+                        'address_id': address_id,
+                        'digital_address': input_digital_address or None,
+                        'digipin': input_digipin or None,
+                        'descriptive_address': descriptive_address or None,
+                        'validation_type': validation_type,
+                        'status': 'IN_PROGRESS' if assign_to_self else 'PENDING',
+                        'priority': priority,
+                        'requester_id': st.session_state.logged_in_agent.get('id'),
+                        'assigned_agent_id': st.session_state.logged_in_agent.get('id') if assign_to_self else None,
+                        'notes': 'Created by agent via Agent Portal'
+                    }
+
+                    val_id = db.create_validation(validation_payload)
+
+                    st.success(f"✅ Validation request created: {val_id}")
+                    if assign_to_self:
+                        # Set as current task for the agent to proceed
+                        st.session_state.current_task = db.get_validation(val_id)
+                        st.session_state.active_tab = 'submit'
+                        st.experimental_rerun()
+                    else:
+                        st.experimental_rerun()
+                except Exception as e:
+                    st.error(f"Failed to create validation: {e}")
         
         # Get tasks for this agent
         tasks = db.get_validations_by_agent(agent.get('id'))
