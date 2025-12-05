@@ -27,7 +27,10 @@ digipin_validator = DIGIPINValidator()
 # CSS
 st.markdown("""
 <style>
+    /* Wider sidebar to prevent truncation */
+    [data-testid="stSidebar"] { min-width: 280px !important; }
     [data-testid="stSidebarNav"] ul { padding-top: 1rem; }
+    [data-testid="stSidebarNav"] span { overflow: visible !important; text-overflow: clip !important; }
     .cm-stat {
         background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
         padding: 1.5rem;
