@@ -1,11 +1,12 @@
-# pages/9_📚_AIP_Registry.py
-# AAVA - AIP (Address Information Provider) Registry
-# Maintains the digital address registry with verification details
+# pages/07_📋_Address_Registry.py
+# AAVA - Address Registry (Combined AIP + AIU)
+# Digital Address Registry, Verification Tracking & Third-Party Access
 
 import streamlit as st
 import sys
 import os
 import pandas as pd
+import json
 from datetime import datetime, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -13,8 +14,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.database import DatabaseManager
 
 st.set_page_config(
-    page_title="AIP Registry - AAVA",
-    page_icon="📚",
+    page_title="Address Registry - AAVA",
+    page_icon="📋",
     layout="wide"
 )
 
@@ -50,6 +51,20 @@ st.markdown("""
     .verified { border-left-color: #28a745; }
     .pending { border-left-color: #ffc107; }
     .unverified { border-left-color: #dc3545; }
+    .success-card {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        border: 2px solid #28a745;
+        border-radius: 12px;
+        padding: 2rem;
+        margin: 1rem 0;
+    }
+    .error-card {
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        border: 2px solid #dc3545;
+        border-radius: 12px;
+        padding: 2rem;
+        margin: 1rem 0;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -57,22 +72,22 @@ st.markdown("""
 st.markdown("""
 <div style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); 
             padding: 2rem; border-radius: 12px; color: white; margin-bottom: 2rem;">
-    <h1 style="margin: 0;">📚 AIP - Address Information Provider</h1>
+    <h1 style="margin: 0;">📋 Address Registry</h1>
     <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">
-        Digital Address Registry • Verification Tracking • Address Data Management
+        AIP Registry • AIU Token Access • Verification Tracking • Address Data Management
     </p>
 </div>
 """, unsafe_allow_html=True)
 
 # Introduction
 st.markdown("""
-### What is AIP?
+### Address Information Provider (AIP) & User (AIU) Portal
 
-**Address Information Provider (AIP)** maintains the digital address registry which includes:
-- 📍 Core address data (DIGIPIN, coordinates, descriptive address)
-- ✅ Verification details and history
-- 👤 Tracking which AIA (Agent) supports each address
-- 🔒 Ensuring only authorized parties access accurate data
+This unified registry provides:
+- 📍 **AIP Functions**: Core address data, verification details, and registry management
+- 🔗 **AIU Functions**: Third-party token-based address access for authorized organizations
+- ✅ Verification tracking and AIA (Agent) assignments
+- 🔒 Secure consent-based data sharing
 """)
 
 st.markdown("---")
@@ -137,8 +152,9 @@ with col5:
 st.markdown("---")
 
 # Main Tabs
-tab1, tab2, tab3, tab4 = st.tabs([
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📋 Address Registry", 
+    "🔗 AIU Token Access",
     "✅ Verification Status",
     "👤 AIA Assignments",
     "📈 Registry Analytics"
@@ -214,8 +230,154 @@ with tab1:
     else:
         st.info("📭 No addresses found matching the filters")
 
-# ========== TAB 2: VERIFICATION STATUS ==========
+# ========== TAB 2: AIU TOKEN ACCESS ==========
 with tab2:
+    st.markdown("### 🔗 AIU Token Access Portal")
+    st.markdown("""
+    **Address Information Users (AIUs)** are organizations that need to access verified address 
+    information with user consent. Use the token provided by the user to retrieve their address details.
+    """)
+    
+    col1, col2 = st.columns([3, 1])
+    
+    with col1:
+        access_token = st.text_input(
+            "Access Token",
+            placeholder="Paste the access token provided by the user...",
+            help="This token was generated when the user shared their address with your organization",
+            key="aiu_token"
+        )
+    
+    with col2:
+        st.markdown("<br>", unsafe_allow_html=True)
+        verify_btn = st.button("🔍 Verify & Retrieve", use_container_width=True, type="primary")
+    
+    if verify_btn and access_token:
+        with st.spinner("Verifying token and retrieving address..."):
+            consent = db.get_consent_by_token(access_token.strip())
+            
+            if consent:
+                st.markdown("""
+                <div class="success-card">
+                    <h3 style="color: #28a745; margin: 0;">✅ Token Verified Successfully</h3>
+                    <p style="margin: 0.5rem 0 0 0; color: #155724;">
+                        Access granted. Address details retrieved below.
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # Consent Info
+                st.markdown("### 📋 Consent Information")
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.markdown(f"**Consent ID:** `{consent.get('id')}`")
+                    st.markdown(f"**Purpose:** {consent.get('purpose', 'N/A')}")
+                with col2:
+                    st.markdown(f"**Scope:** {consent.get('scope', 'view').upper()}")
+                    st.markdown(f"**Expires:** {consent.get('expires_at', 'Never')[:10] if consent.get('expires_at') else 'Never'}")
+                with col3:
+                    st.markdown(f"**Access Count:** {consent.get('access_count', 0)}")
+                    st.markdown(f"**Granted:** {consent.get('issued_at', 'N/A')[:10] if consent.get('issued_at') else 'N/A'}")
+                
+                st.markdown("---")
+                
+                # Address Details
+                st.markdown("### 📍 Address Details")
+                
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.markdown("#### Core Information")
+                    
+                    digipin = consent.get('digipin', 'N/A')
+                    formatted_digipin = f"{digipin[:3]}-{digipin[3:6]}-{digipin[6:]}" if len(digipin) == 10 else digipin
+                    st.markdown(f"""
+                    <div style="background: #e3f2fd; padding: 1rem; border-radius: 8px; margin: 0.5rem 0;">
+                        <span style="color: #1565c0; font-weight: 500;">DIGIPIN</span><br>
+                        <span style="font-size: 1.5rem; font-weight: bold; font-family: monospace;">{formatted_digipin}</span>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    if consent.get('digital_address'):
+                        st.markdown(f"**Digital Address:** {consent.get('digital_address')}")
+                    
+                    st.markdown(f"**Descriptive Address:**")
+                    st.info(consent.get('descriptive_address', 'N/A'))
+                    
+                    st.markdown(f"**City:** {consent.get('city', 'N/A')}")
+                    st.markdown(f"**State:** {consent.get('state', 'N/A')}")
+                    st.markdown(f"**PIN Code:** {consent.get('pincode', 'N/A')}")
+                
+                with col2:
+                    st.markdown("#### Location & Verification")
+                    
+                    lat = consent.get('latitude')
+                    lon = consent.get('longitude')
+                    
+                    if lat and lon:
+                        st.markdown(f"**Coordinates:** {lat:.6f}, {lon:.6f}")
+                        map_data = pd.DataFrame({'lat': [lat], 'lon': [lon]})
+                        st.map(map_data, zoom=15)
+                    
+                    score = consent.get('confidence_score', 0)
+                    grade = consent.get('confidence_grade', 'F')
+                    grade_color = {'A': '#28a745', 'B': '#5cb85c', 'C': '#ffc107', 'D': '#fd7e14', 'F': '#dc3545'}.get(grade, '#6c757d')
+                    
+                    st.markdown(f"""
+                    <div style="background: {grade_color}20; padding: 1rem; border-radius: 8px; 
+                                border: 2px solid {grade_color}; text-align: center; margin-top: 1rem;">
+                        <span style="color: #666;">Confidence Score</span><br>
+                        <span style="font-size: 2rem; font-weight: bold; color: {grade_color};">{grade}</span><br>
+                        <span style="font-size: 1.2rem; font-weight: 600;">{score:.0f}%</span>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                # Export
+                st.markdown("---")
+                export_data = {
+                    "consent_id": consent.get('id'),
+                    "digipin": consent.get('digipin'),
+                    "digital_address": consent.get('digital_address'),
+                    "descriptive_address": consent.get('descriptive_address'),
+                    "city": consent.get('city'),
+                    "state": consent.get('state'),
+                    "pincode": consent.get('pincode'),
+                    "latitude": consent.get('latitude'),
+                    "longitude": consent.get('longitude'),
+                    "confidence_score": consent.get('confidence_score'),
+                    "confidence_grade": consent.get('confidence_grade'),
+                    "retrieved_at": datetime.now().isoformat()
+                }
+                
+                st.download_button(
+                    "📥 Download JSON",
+                    data=json.dumps(export_data, indent=2),
+                    file_name=f"address_{consent.get('digipin', 'data')}.json",
+                    mime="application/json"
+                )
+                
+            else:
+                st.markdown("""
+                <div class="error-card">
+                    <h3 style="color: #dc3545; margin: 0;">❌ Token Invalid or Expired</h3>
+                    <p style="margin: 0.5rem 0 0 0; color: #721c24;">
+                        The access token could not be verified.
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                st.markdown("""
+                **Possible Reasons:**
+                - Token expired or revoked
+                - Invalid or corrupted token
+                - Token does not exist
+                """)
+    
+    elif verify_btn and not access_token:
+        st.warning("⚠️ Please enter an access token")
+
+# ========== TAB 3: VERIFICATION STATUS ==========
+with tab3:
     st.markdown("### ✅ Verification Status Tracking")
     
     # Get validations with details
@@ -271,8 +433,8 @@ with tab2:
     else:
         st.info("📭 No validations recorded yet")
 
-# ========== TAB 3: AIA ASSIGNMENTS ==========
-with tab3:
+# ========== TAB 4: AIA ASSIGNMENTS ==========
+with tab4:
     st.markdown("### 👤 AIA (Agent) - Address Assignments")
     st.markdown("Track which Address Information Agent (AIA) supports each Digital Address")
     
@@ -315,8 +477,8 @@ with tab3:
     else:
         st.info("📭 No agents registered yet")
 
-# ========== TAB 4: REGISTRY ANALYTICS ==========
-with tab4:
+# ========== TAB 5: REGISTRY ANALYTICS ==========
+with tab5:
     st.markdown("### 📈 Registry Analytics")
     
     if all_addresses:
