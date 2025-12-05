@@ -28,8 +28,9 @@ st.markdown("""
     [data-testid="stSidebar"] { min-width: 280px !important; width: 280px !important; }
     [data-testid="stSidebar"] > div:first-child { width: 280px !important; }
     [data-testid="stSidebarNav"] ul { padding-top: 1rem; }
-    [data-testid="stSidebarNav"] a { white-space: nowrap !important; }
-    [data-testid="stSidebarNav"] span { overflow: visible !important; text-overflow: clip !important; }
+    [data-testid="stSidebarNav"] li { margin-bottom: 0.5rem; }
+    [data-testid="stSidebarNav"] a { font-size: 1.05rem !important; padding: 0.6rem 1rem !important; white-space: nowrap !important; }
+    [data-testid="stSidebarNav"] span { font-size: 1.05rem !important; overflow: visible !important; text-overflow: clip !important; }
     .success-card {
         background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
         border: 2px solid #28a745;

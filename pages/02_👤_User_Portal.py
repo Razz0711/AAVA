@@ -31,8 +31,8 @@ st.markdown("""
     [data-testid="stSidebar"] > div:first-child { width: 280px !important; }
     [data-testid="stSidebarNav"] ul { padding-top: 1rem; }
     [data-testid="stSidebarNav"] li { margin-bottom: 0.5rem; }
-    [data-testid="stSidebarNav"] a { white-space: nowrap !important; }
-    [data-testid="stSidebarNav"] span { overflow: visible !important; text-overflow: clip !important; }
+    [data-testid="stSidebarNav"] a { font-size: 1.05rem !important; padding: 0.6rem 1rem !important; white-space: nowrap !important; }
+    [data-testid="stSidebarNav"] span { font-size: 1.05rem !important; overflow: visible !important; text-overflow: clip !important; }
     .user-card {
         background: white;
         border-radius: 12px;
