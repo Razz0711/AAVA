@@ -526,6 +526,18 @@ class DatabaseManager:
             )
             return [self._row_to_dict(row) for row in cursor.fetchall()]
     
+    def get_pending_validation_for_address(self, address_id: str) -> Optional[Dict]:
+        """Get pending validation for an address if exists."""
+        with self.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                """SELECT * FROM validations 
+                   WHERE address_id = ? AND status IN ('PENDING', 'IN_PROGRESS')
+                   ORDER BY created_at DESC LIMIT 1""",
+                (address_id,)
+            )
+            return self._row_to_dict(cursor.fetchone())
+    
     def get_validations_by_agent(self, agent_id: str) -> List[Dict]:
         """Get all validations assigned to an agent."""
         with self.get_connection() as conn:
