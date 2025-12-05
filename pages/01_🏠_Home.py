@@ -14,13 +14,25 @@ st.set_page_config(
     layout="wide"
 )
 
-# Sidebar Navigation CSS
+# Sidebar Navigation CSS - Fix truncation
 st.markdown("""
 <style>
+    /* Wider sidebar to prevent truncation */
+    [data-testid="stSidebar"] {
+        min-width: 280px !important;
+    }
     [data-testid="stSidebarNav"] ul { padding-top: 1rem; }
     [data-testid="stSidebarNav"] li { margin-bottom: 0.5rem; }
-    [data-testid="stSidebarNav"] a { font-size: 1.05rem !important; padding: 0.6rem 1rem !important; }
-    [data-testid="stSidebarNav"] span { font-size: 1.05rem !important; }
+    [data-testid="stSidebarNav"] a { 
+        font-size: 1.05rem !important; 
+        padding: 0.6rem 1rem !important;
+        white-space: nowrap !important;
+    }
+    [data-testid="stSidebarNav"] span { 
+        font-size: 1.05rem !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -58,7 +70,7 @@ with col1:
     </div>
     """, unsafe_allow_html=True)
     if st.button("Open →", key="btn_user"):
-        st.switch_page("pages/7_👤_User_Portal.py")
+        st.switch_page("pages/02_👤_User_Portal.py")
 
 with col2:
     st.markdown("""
@@ -73,24 +85,9 @@ with col2:
     </div>
     """, unsafe_allow_html=True)
     if st.button("Open →", key="btn_val"):
-        st.switch_page("pages/2_✅_Validation_Request.py")
+        st.switch_page("pages/03_✅_Validation_Request.py")
 
 with col3:
-    st.markdown("""
-    <div style="background: white; padding: 1.5rem; border-radius: 12px; 
-                box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
-                border-left: 4px solid #2196F3;">
-        <h3 style="margin: 0;">📱</h3>
-        <h4 style="margin: 0.5rem 0;">Agent Portal</h4>
-        <p style="color: #666; font-size: 0.9rem; margin: 0;">
-            Field agent verification
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
-    if st.button("Open →", key="btn_agent"):
-        st.switch_page("pages/3_📱_Agent_Portal.py")
-
-with col4:
     st.markdown("""
     <div style="background: white; padding: 1.5rem; border-radius: 12px; 
                 box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
@@ -103,7 +100,22 @@ with col4:
     </div>
     """, unsafe_allow_html=True)
     if st.button("Open →", key="btn_score"):
-        st.switch_page("pages/4_📊_Confidence_Score.py")
+        st.switch_page("pages/04_📊_Confidence_Score.py")
+
+with col4:
+    st.markdown("""
+    <div style="background: white; padding: 1.5rem; border-radius: 12px; 
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
+                border-left: 4px solid #2196F3;">
+        <h3 style="margin: 0;">📱</h3>
+        <h4 style="margin: 0.5rem 0;">Agent Portal</h4>
+        <p style="color: #666; font-size: 0.9rem; margin: 0;">
+            Field agent verification
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    if st.button("Open →", key="btn_agent"):
+        st.switch_page("pages/05_📱_Agent_Portal.py")
 
 # Second row - more options
 col1, col2, col3, col4 = st.columns(4)
@@ -121,29 +133,29 @@ with col1:
     </div>
     """, unsafe_allow_html=True)
     if st.button("Open →", key="btn_admin"):
-        st.switch_page("pages/5_⚙️_Admin_Panel.py")
+        st.switch_page("pages/06_⚙️_Admin_Panel.py")
 
 with col2:
     st.markdown("""
     <div style="background: white; padding: 1.5rem; border-radius: 12px; 
                 box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
-                border-left: 4px solid #00BCD4;">
-        <h3 style="margin: 0;">🤖</h3>
-        <h4 style="margin: 0.5rem 0;">AI Chat</h4>
+                border-left: 4px solid #FF5722;">
+        <h3 style="margin: 0;">🔗</h3>
+        <h4 style="margin: 0.5rem 0;">AIU Access</h4>
         <p style="color: #666; font-size: 0.9rem; margin: 0;">
-            Ask me anything!
+            Token-based access
         </p>
     </div>
     """, unsafe_allow_html=True)
-    if st.button("Open →", key="btn_chat"):
-        st.switch_page("pages/6_🤖_AI_Chat.py")
+    if st.button("Open →", key="btn_aiu"):
+        st.switch_page("pages/07_🔗_AIU_Access.py")
 
 with col3:
     st.markdown("""
     <div style="background: white; padding: 1.5rem; border-radius: 12px; 
                 box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
                 border-left: 4px solid #11998e;">
-        <h3 style="margin: 0;">📚</h3>
+        <h3 style="margin: 0;">📋</h3>
         <h4 style="margin: 0.5rem 0;">AIP Registry</h4>
         <p style="color: #666; font-size: 0.9rem; margin: 0;">
             Address registry
@@ -151,7 +163,7 @@ with col3:
     </div>
     """, unsafe_allow_html=True)
     if st.button("Open →", key="btn_aip"):
-        st.switch_page("pages/9_📚_AIP_Registry.py")
+        st.switch_page("pages/08_📋_AIP_Registry.py")
 
 with col4:
     st.markdown("""
@@ -166,7 +178,25 @@ with col4:
     </div>
     """, unsafe_allow_html=True)
     if st.button("Open →", key="btn_cm"):
-        st.switch_page("pages/10_🗺️_Central_Mapper.py")
+        st.switch_page("pages/09_🗺️_Central_Mapper.py")
+
+# Row 3 - Support
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+    st.markdown("""
+    <div style="background: white; padding: 1.5rem; border-radius: 12px; 
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
+                border-left: 4px solid #00BCD4;">
+        <h3 style="margin: 0;">🤖</h3>
+        <h4 style="margin: 0.5rem 0;">AI Chat</h4>
+        <p style="color: #666; font-size: 0.9rem; margin: 0;">
+            Ask me anything!
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    if st.button("Open →", key="btn_chat"):
+        st.switch_page("pages/10_🤖_AI_Chat.py")
 
 st.divider()
 
