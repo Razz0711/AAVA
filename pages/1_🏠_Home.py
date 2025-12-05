@@ -138,6 +138,36 @@ with col2:
     if st.button("Open →", key="btn_chat"):
         st.switch_page("pages/6_🤖_AI_Chat.py")
 
+with col3:
+    st.markdown("""
+    <div style="background: white; padding: 1.5rem; border-radius: 12px; 
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
+                border-left: 4px solid #11998e;">
+        <h3 style="margin: 0;">📚</h3>
+        <h4 style="margin: 0.5rem 0;">AIP Registry</h4>
+        <p style="color: #666; font-size: 0.9rem; margin: 0;">
+            Address registry
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    if st.button("Open →", key="btn_aip"):
+        st.switch_page("pages/9_📚_AIP_Registry.py")
+
+with col4:
+    st.markdown("""
+    <div style="background: white; padding: 1.5rem; border-radius: 12px; 
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center;
+                border-left: 4px solid #1e3a5f;">
+        <h3 style="margin: 0;">🗺️</h3>
+        <h4 style="margin: 0.5rem 0;">Central Mapper</h4>
+        <p style="color: #666; font-size: 0.9rem; margin: 0;">
+            DIGIPIN registry
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    if st.button("Open →", key="btn_cm"):
+        st.switch_page("pages/10_🗺️_Central_Mapper.py")
+
 st.divider()
 
 # About section
@@ -169,24 +199,23 @@ with col1:
 
 with col2:
     st.markdown("""
-    ### DHRUVA Ecosystem
+    ### DHRUVA Ecosystem (Fully Implemented)
     
-    AAVA implements these DHRUVA components:
+    | Component | Role | Page |
+    |-----------|------|------|
+    | **AIA** | Address Issuance Authority - User consent & address management | 👤 User Portal |
+    | **AIP** | Address Information Provider - Address registry & verification | 📚 AIP Registry |
+    | **AIU** | Address Information User - Token-based access for services | 🔗 AIU Access |
+    | **CM** | Central Mapper - DIGIPIN encoding/decoding registry | 🗺️ Central Mapper |
     
-    | Component | Role |
-    |-----------|------|
-    | **AIA** | Address Issuance Authority (user consent & address management) |
-    | **AIP** | Address Information Provider (address registry) |
-    | **AIU** | Address Information User (service consumers) |
-    | **CM** | Central Mapper (DIGIPIN registry) |
+    ### Complete Feature Set
     
-    ### AIA Features (User Portal)
-    
-    - 👤 **User Accounts**: Register, login, manage profile
-    - 🏠 **Address Management**: Create, update, delete addresses
-    - 🔐 **Consent Control**: Grant/revoke access to third parties
-    - 🔗 **Address Sharing**: Generate secure tokens for AIUs
-    - 📜 **Access History**: Track who accessed your data
+    - 👤 **User Portal**: Registration, address management, consent control
+    - 📚 **AIP Registry**: Address database, verification tracking, analytics
+    - 🔗 **AIU Access**: Token verification, address retrieval for third parties
+    - 🗺️ **Central Mapper**: DIGIPIN lookup, encoding, grid reference
+    - 📊 **Confidence Scoring**: Multi-factor address quality scoring
+    - 📱 **Agent Portal**: Field verification by certified agents
     """)
 
 st.divider()
