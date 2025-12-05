@@ -589,9 +589,14 @@ def agent_dashboard():
                                     current_score = float(address.get('confidence_score', 50))
                                     
                                     if is_verified:
-                                        # Physical verification adds 20% (PVS component)
-                                        # Quality score influences the boost
-                                        verification_boost = 20 * calculated_quality
+                                        # Physical verification boost formula:
+                                        # Base boost = 30% (for getting verified)
+                                        # Quality bonus = quality_score * 20% (0-20% extra)
+                                        # Total possible boost: 30% + 20% = 50%
+                                        # So 50% + 50% = 100% max with quality=100%
+                                        base_boost = 30
+                                        quality_bonus = 20 * calculated_quality
+                                        verification_boost = base_boost + quality_bonus
                                         new_score = min(100, current_score + verification_boost)
                                         new_grade = 'A+' if new_score >= 90 else 'A' if new_score >= 80 else 'B' if new_score >= 70 else 'C' if new_score >= 60 else 'D' if new_score >= 50 else 'F'
                                     else:

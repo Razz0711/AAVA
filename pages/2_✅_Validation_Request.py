@@ -561,42 +561,32 @@ with tab2:
                     """, unsafe_allow_html=True)
                 
                 with col2:
-                    if st.button("View Details", key=f"view_{val.get('id')}"):
-                        st.session_state.selected_validation = val.get('id')
-                        st.rerun()
-            
-            # Show selected validation details
-            if 'selected_validation' in st.session_state:
-                val_id = st.session_state.selected_validation
-                val_details = db.get_validation(val_id)
-                
-                if val_details:
-                    st.divider()
-                    st.markdown(f"### Validation Details: {val_id}")
-                    
-                    col1, col2 = st.columns(2)
-                    
-                    with col1:
-                        st.json(val_details)
-                    
-                    with col2:
-                        # Get related verifications
-                        verifications = db.get_verifications_by_validation(val_id)
-                        
-                        if verifications:
-                            st.markdown("#### Verifications")
-                            for ver in verifications:
-                                st.markdown(f"""
-                                - **{ver.get('id')}**: 
-                                  {'✅ Verified' if ver.get('verified') else '❌ Not Verified'}
-                                  (Quality: {ver.get('quality_score', 0):.0%})
-                                """)
-                        else:
-                            st.info("No verifications yet")
-                        
-                        if st.button("Close Details"):
-                            del st.session_state.selected_validation
-                            st.rerun()
+                    # Use expander to show details directly
+                    with st.expander("View Details", expanded=False):
+                        val_details = db.get_validation(val.get('id'))
+                        if val_details:
+                            st.markdown(f"""
+                            **Address ID:** {val_details.get('address_id', 'N/A')}  
+                            **Digital Address:** {val_details.get('digital_address', 'N/A')}  
+                            **Type:** {val_details.get('validation_type', 'N/A')}  
+                            **Agent:** {val_details.get('assigned_agent_id', 'Unassigned')}  
+                            **Created:** {val_details.get('created_at', 'N/A')[:19] if val_details.get('created_at') else 'N/A'}
+                            """)
+                            
+                            # Get related verifications
+                            verifications = db.get_verifications_by_validation(val.get('id'))
+                            
+                            if verifications:
+                                st.markdown("**Verifications:**")
+                                for ver in verifications:
+                                    status_icon = "✅" if ver.get('verified') else "❌"
+                                    st.markdown(f"""
+                                    {status_icon} Quality: **{ver.get('quality_score', 0)*100:.0f}%** | 
+                                    Agent: {ver.get('agent_id', 'N/A')} | 
+                                    Date: {ver.get('timestamp', 'N/A')[:10] if ver.get('timestamp') else 'N/A'}
+                                    """)
+                            else:
+                                st.info("No verifications yet")
         
         else:
             st.info("📋 No validation requests found. Submit a new request to get started!")
