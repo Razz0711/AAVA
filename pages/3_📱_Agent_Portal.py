@@ -219,6 +219,11 @@ def agent_dashboard():
         **Performance:** {agent.get('performance_score', 0) * 100:.0f}%
         """)
     
+    # Check if we should show alert for pending verification
+    if st.session_state.get('active_tab') == 'submit' and st.session_state.current_task:
+        st.success("✅ **Task started!** Go to '✅ Submit Verification' tab to complete the verification.")
+        st.session_state.active_tab = None  # Clear after showing
+    
     # Main tabs
     tab1, tab2, tab3 = st.tabs(["📋 Assigned Tasks", "✅ Submit Verification", "📊 My Stats"])
     
@@ -279,44 +284,8 @@ def agent_dashboard():
             st.divider()
         
         if not active_tasks and not unassigned_tasks:
-            # Create sample tasks for demo
-            st.info("📋 No active tasks assigned. Creating demo tasks...")
-            
-            # Create sample pending validations
-            for i in range(3):
-                cities = [
-                    ("New Delhi", 28.6139, 77.2090, "110001"),
-                    ("Mumbai", 19.0760, 72.8777, "400001"),
-                    ("Bangalore", 12.9716, 77.5946, "560001")
-                ]
-                city, lat, lon = cities[i][:3]
-                pincode = cities[i][3]
-                
-                digipin_result = validator.encode(lat + random.uniform(-0.01, 0.01),
-                                                  lon + random.uniform(-0.01, 0.01))
-                
-                # Create address
-                addr_id = db.create_address({
-                    'digipin': digipin_result.digipin,
-                    'descriptive_address': f"Sample Address {i+1}, {city}",
-                    'latitude': lat,
-                    'longitude': lon,
-                    'city': city,
-                    'pincode': pincode
-                })
-                
-                # Create validation
-                db.create_validation({
-                    'address_id': addr_id,
-                    'digipin': digipin_result.digipin,
-                    'descriptive_address': f"Sample Address {i+1}, {city}",
-                    'validation_type': 'PHYSICAL',
-                    'status': 'PENDING',
-                    'priority': ['NORMAL', 'HIGH', 'URGENT'][i % 3],
-                    'assigned_agent_id': agent.get('id')
-                })
-            
-            st.rerun()
+            # No tasks available - show message
+            st.info("📋 No tasks available. New validation requests will appear here when users request verification.")
         
         # Show assigned/claimed tasks
         if active_tasks:
@@ -363,6 +332,7 @@ def agent_dashboard():
                     
                     if st.button(f"📍 Start Verification", key=f"start_{task.get('id')}"):
                         st.session_state.current_task = task
+                        st.session_state.active_tab = "submit"  # Switch to submit tab
                         # Update status to IN_PROGRESS
                         db.update_validation(task.get('id'), {'status': 'IN_PROGRESS'})
                         st.rerun()
