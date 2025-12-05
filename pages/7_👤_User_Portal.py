@@ -399,26 +399,121 @@ def show_user_dashboard():
         
         else:  # Create New
             st.markdown("Create a new digital address")
+            
+            # Check if we need to show the "address exists" dialog
+            if 'existing_address_conflict' in st.session_state and st.session_state.existing_address_conflict:
+                conflict = st.session_state.existing_address_conflict
+                existing = conflict['existing_address']
+                
+                st.warning(f"⚠️ Digital address `{conflict['digital_addr']}` already exists!")
+                
+                st.markdown(f"""
+                <div style="background: rgba(255,152,0,0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid #ff9800; margin: 1rem 0;">
+                    <strong>📍 Current Location:</strong><br>
+                    {existing.get('descriptive_address', 'N/A')}<br>
+                    <small>City: {existing.get('city', 'N/A')} | Confidence: {existing.get('confidence_score', 0):.0f}%</small>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                st.markdown("**What would you like to do?**")
+                
+                col1, col2, col3 = st.columns(3)
+                
+                with col1:
+                    if st.button("🔄 Update Location", type="primary", use_container_width=True, 
+                                help="I moved - update to new address"):
+                        # Update the existing address
+                        try:
+                            address_id = existing['id']
+                            db.update_address(address_id, {
+                                'digipin': conflict['digipin'].upper().replace('-', ''),
+                                'descriptive_address': conflict['descriptive'],
+                                'latitude': conflict['lat'],
+                                'longitude': conflict['lon'],
+                                'city': conflict['city'],
+                                'state': conflict['state'],
+                                'pincode': conflict['pincode'],
+                                'confidence_score': 50,  # Reset score for new location
+                                'confidence_grade': 'C'
+                            })
+                            
+                            # Check if already linked to user
+                            already_linked = any(ua['address_id'] == address_id for ua in user_addresses)
+                            if not already_linked:
+                                db.link_address_to_user(user['id'], address_id, conflict['label'], conflict['is_primary'])
+                            
+                            # Create validation request
+                            validation_id = db.create_validation({
+                                'address_id': address_id,
+                                'digital_address': conflict['digital_addr'],
+                                'digipin': conflict['digipin'].upper().replace('-', ''),
+                                'descriptive_address': conflict['descriptive'],
+                                'validation_type': 'PHYSICAL',
+                                'status': 'PENDING',
+                                'priority': 'NORMAL',
+                                'requester_id': user['id'],
+                                'notes': f'Address location updated by {user.get("name", "user")}'
+                            })
+                            
+                            st.session_state.existing_address_conflict = None
+                            st.success(f"✅ Location updated! `{conflict['digital_addr']}` now points to new address.")
+                            st.info(f"📋 Validation request **{validation_id}** created.")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"❌ Error: {str(e)}")
+                
+                with col2:
+                    if st.button("➕ Create New", use_container_width=True,
+                                help="Add as different address with new digital address"):
+                        st.session_state.existing_address_conflict = None
+                        st.session_state.prefill_address = {
+                            'digipin': conflict['digipin'],
+                            'descriptive': conflict['descriptive'],
+                            'city': conflict['city'],
+                            'state': conflict['state'],
+                            'pincode': conflict['pincode'],
+                            'label': conflict['label']
+                        }
+                        st.info("💡 Please enter a different digital address (e.g., `raj.office@aava.in`)")
+                        st.rerun()
+                
+                with col3:
+                    if st.button("❌ Cancel", use_container_width=True):
+                        st.session_state.existing_address_conflict = None
+                        st.rerun()
+                
+                st.stop()
+            
+            # Check for prefilled data (from "Create New" option)
+            prefill = st.session_state.get('prefill_address', {})
+            
             with st.form("create_address_form"):
                 col1, col2 = st.columns(2)
                 
                 with col1:
                     digipin = st.text_input("📍 DIGIPIN (10 characters)*", 
+                                           value=prefill.get('digipin', ''),
                                            help="Enter the DIGIPIN code for your location")
                     digital_addr = st.text_input("📧 Digital Address", 
-                                                 placeholder="username@provider.in")
-                    label = st.text_input("🏷️ Label", value="Home", 
+                                                 placeholder="username@provider.in",
+                                                 help="Use different addresses for different locations (e.g., raj@aava.in, raj.office@aava.in)")
+                    label = st.text_input("🏷️ Label", value=prefill.get('label', 'Home'), 
                                          help="e.g., Home, Office, Shop")
                 
                 with col2:
                     descriptive = st.text_area("📝 Descriptive Address*", 
+                                               value=prefill.get('descriptive', ''),
                                                placeholder="House No, Street, Locality...")
                     col_city, col_state = st.columns(2)
                     with col_city:
-                        city = st.text_input("🏙️ City")
+                        city = st.text_input("🏙️ City", value=prefill.get('city', ''))
                     with col_state:
-                        state = st.text_input("🗺️ State")
-                    pincode = st.text_input("📮 PIN Code")
+                        state = st.text_input("🗺️ State", value=prefill.get('state', ''))
+                    pincode = st.text_input("📮 PIN Code", value=prefill.get('pincode', ''))
+                
+                # Clear prefill after form is shown
+                if prefill:
+                    st.session_state.prefill_address = {}
                 
                 is_primary = st.checkbox("Set as Primary Address", value=len(user_addresses) == 0)
                 
@@ -435,44 +530,26 @@ def show_user_dashboard():
                         decode_result = digipin_validator.decode(digipin)
                         
                         try:
-                            # Check if digital address already exists (user wants to update location)
+                            # Check if digital address already exists
                             existing_address = None
                             if digital_addr:
                                 existing_address = db.get_address_by_digital_address(digital_addr)
                             
                             if existing_address:
-                                # UPDATE existing address with new location
-                                address_id = existing_address['id']
-                                db.update_address(address_id, {
-                                    'digipin': digipin.upper().replace('-', ''),
-                                    'descriptive_address': descriptive,
-                                    'latitude': decode_result.center_lat,
-                                    'longitude': decode_result.center_lon,
+                                # Store conflict data and show dialog
+                                st.session_state.existing_address_conflict = {
+                                    'existing_address': existing_address,
+                                    'digital_addr': digital_addr,
+                                    'digipin': digipin,
+                                    'descriptive': descriptive,
                                     'city': city,
                                     'state': state,
-                                    'pincode': pincode
-                                })
-                                
-                                # Check if already linked to user
-                                already_linked = any(ua['address_id'] == address_id for ua in user_addresses)
-                                if not already_linked:
-                                    db.link_address_to_user(user['id'], address_id, label, is_primary)
-                                
-                                # Create validation request for the new location
-                                validation_id = db.create_validation({
-                                    'address_id': address_id,
-                                    'digital_address': digital_addr,
-                                    'digipin': digipin.upper().replace('-', ''),
-                                    'descriptive_address': descriptive,
-                                    'validation_type': 'PHYSICAL',
-                                    'status': 'PENDING',
-                                    'priority': 'NORMAL',
-                                    'requester_id': user['id'],
-                                    'notes': f'Address location updated by {user.get("name", "user")}'
-                                })
-                                
-                                st.success(f"✅ Address location updated! Your digital address `{digital_addr}` now points to the new location.")
-                                st.info(f"📋 Validation request **{validation_id}** created. An agent will verify your new location soon!")
+                                    'pincode': pincode,
+                                    'label': label,
+                                    'is_primary': is_primary,
+                                    'lat': decode_result.center_lat,
+                                    'lon': decode_result.center_lon
+                                }
                                 st.rerun()
                             else:
                                 # Create NEW address
