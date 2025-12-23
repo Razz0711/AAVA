@@ -258,13 +258,17 @@ python utils/digipin.py
 
 This project is developed for the DHRUVA hackathon demonstration purposes.
 
-## 🤝 Contributing
-
-This is a hackathon project. For production deployment, please contact the AAVA team.
-
 ## 📞 Support
 
-For questions or issues, please refer to the DHRUVA documentation or contact the development team.
+rajkumaratsvnit@gmail.com
+
+## Demo Video
+
+https://youtu.be/wm_ES_RBD10?si=vkjQc9ppdXhQZO-e
+
+## Demo web link
+
+https://aava-app.streamlit.app/
 
 ---
 
