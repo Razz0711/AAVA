@@ -82,6 +82,14 @@ AAVA System
 6. **Open in browser**
    - The app will automatically open at `http://localhost:8501`
 
+## Demo Video
+
+https://youtu.be/wm_ES_RBD10?si=vkjQc9ppdXhQZO-e
+
+## Demo web link
+
+https://aava-app.streamlit.app/
+
 ## 📁 Project Structure
 
 ```
@@ -107,6 +115,7 @@ Development of AAVA/
 └── data/                          # Auto-created data folder
     └── aava.db                    # SQLite database
 ```
+
 
 ## 🔧 Features
 
@@ -262,13 +271,6 @@ This project is developed for the DHRUVA hackathon demonstration purposes.
 
 rajkumaratsvnit@gmail.com
 
-## Demo Video
-
-https://youtu.be/wm_ES_RBD10?si=vkjQc9ppdXhQZO-e
-
-## Demo web link
-
-https://aava-app.streamlit.app/
 
 ---
 
